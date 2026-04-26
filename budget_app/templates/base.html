@@ -1,11 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Expense Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'dashboard' %}">💰 Expense Tracker</a>
+            {% if user.is_authenticated %}
+                <div>
+                    <span class="text-white me-3">Hello, {{ user.username }}!</span>
+                    <a href="{% url 'add_expense' %}" class="btn btn-success btn-sm">+ Add Expense</a>
+                    <a href="{% url 'expense_list' %}" class="btn btn-info btn-sm">All Expenses</a>
+                    3<a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Logout</a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
     
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
+    </div>
 </body>
 </html>
