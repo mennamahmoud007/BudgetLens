@@ -1,5 +1,5 @@
 # Expense service - business logic for expenses
-from expenses.models import Expense, Category
+from budget_app.models import Expense, Category
 from django.utils import timezone
 from decimal import Decimal
 
