@@ -20,8 +20,14 @@ Including another URLconf
 # urlpatterns = [
 #     path('admin/', admin.site.urls),
 # ]
+from django.contrib import admin
 from django.urls import path, include
+from expenses import views
 
 urlpatterns = [
-    path('', include('budget_app.urls')),
+    path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),  # Add this for login/logout
+    path('', views.dashboard, name='dashboard'),
+    path('add/', views.add_expense, name='add_expense'),
+    path('list/', views.expense_list, name='expense_list'),
 ]
