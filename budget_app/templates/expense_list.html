@@ -1,0 +1,44 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>All Expenses</h3>
+        <a href="{% url 'add_expense' %}" class="btn btn-success btn-sm float-end">+ Add New</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.date|date:"M d, Y" }}</td>
+                        <td><span class="badge bg-secondary">{{ expense.category.name }}</span></td>
+                        <td>{{ expense.description }}</td>
+                        <td class="text-end text-danger">${{ expense.amount }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No expenses yet. <a href="{% url 'add_expense' %}">Add your first expense!</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="table-info">
+                        <td colspan="3"><strong>Total</strong></td>
+                        <td class="text-end"><strong>${{ expenses|length|default:0 }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
