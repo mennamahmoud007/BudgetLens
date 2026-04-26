@@ -1,11 +1,282 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3>💰 Spending Insights</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label>Filter by period:</label>
+                    <div class="btn-group">
+                        <a href="?days=7" class="btn btn-sm btn-outline-primary {% if selected_days == 7 %}active{% endif %}">Last 7 days</a>
+                        <a href="?days=30" class="btn btn-sm btn-outline-primary {% if selected_days == 30 %}active{% endif %}">Last 30 days</a>
+                        <a href="?days=90" class="btn btn-sm btn-outline-primary {% if selected_days == 90 %}active{% endif %}">Last 90 days</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Summary Cards -->
+    <div class="col-md-3">
+        <div class="card bg-primary text-white mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Spent</h5>
+                <h2 class="card-text">${{ total_spent|floatformat:2 }}</h2>
+                <small>Last {{ selected_days }} days</small>
+            </div>
+        </div>
+    </div>
     
-</body>
-</html>
+    <div class="col-md-3">
+        <div class="card bg-info text-white mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Daily Average</h5>
+                <h2 class="card-text">${{ daily_average|floatformat:2 }}</h2>
+                <small>per day</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white mb-3">
+            <div class="card-body">
+                <h5 class="card-title">This Week</h5>
+                <h2 class="card-text">${{ weekly_comparison.this_week|floatformat:2 }}</h2>
+                {% if weekly_comparison.percent_change > 0 %}
+                    <small class="text-warning">↑ {{ weekly_comparison.percent_change|floatformat:1 }}% vs last week</small>
+                {% elif weekly_comparison.percent_change < 0 %}
+                    <small class="text-light">↓ {{ weekly_comparison.percent_change|floatformat:1 }}% vs last week</small>
+                {% else %}
+                    <small>Same as last week</small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Categories</h5>
+                <h2 class="card-text">{{ by_category|length }}</h2>
+                <small>with spending</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Pie Chart: Spending by Category -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>📊 Spending by Category</h4>
+            </div>
+            <div class="card-body">
+                <canvas id="categoryChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bar Chart: Monthly Trend -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>📈 Monthly Trend</h4>
+            </div>
+            <div class="card-body">
+                <canvas id="trendChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Top Categories List -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4>🔥 Top Spending Categories</h4>
+            </div>
+            <div class="card-body">
+                {% if top_categories %}
+                    <div class="list-group">
+                        {% for cat in top_categories %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>{{ cat.category }}</strong>
+                                    <span class="badge bg-primary rounded-pill">${{ cat.total|floatformat:2 }}</span>
+                                </div>
+                                <!-- <div class="progress mt-2">
+                                <div class="progress-bar" style="width: 100%; background-color: #007bff;">
+                                  ${{ cat.total|floatformat:2 }}
+                                 </div>                                -->
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <p class="text-muted">No expenses yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Expenses -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4>📝 Recent Expenses</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in recent_expenses %}
+                            <tr>
+                                <td>{{ expense.date|date:"M d, Y" }}</td>
+                                <td><span class="badge bg-secondary">{{ expense.category.name }}</span></td>
+                                <td>{{ expense.description }}</td>
+                                <td class="text-end text-danger">${{ expense.amount }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No expenses yet. <a href="{% url 'add_expense' %}">Add your first expense!</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{% url 'expense_list' %}" class="btn btn-sm btn-info">View All Expenses →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{{ by_category|json_script:"category-data" }}
+{{ monthly_trend|json_script:"trend-data" }}
+
+<script>
+    // Category Pie Chart Data
+    const categoryData = JSON.parse(document.getElementById('category-data').textContent);
+    const categoryLabels = Object.keys(categoryData);
+    const categoryValues = Object.values(categoryData);
+
+    // Colors for pie chart
+    const colors = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+        '#FF9F40', '#FF6384', '#C9CBCF', '#7CFC00', '#FF1493'
+    ];
+
+    if (categoryLabels.length > 0) {
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'pie',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryValues,
+                    backgroundColor: colors.slice(0, categoryLabels.length),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${label}: $${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        document.getElementById('categoryChart').parentElement.innerHTML = '<p class="text-center">No data to display. Add some expenses!</p>';
+    }
+
+    // Monthly Trend Bar Chart
+    const trendData = JSON.parse(document.getElementById('trend-data').textContent);
+    const trendLabels = Object.keys(trendData);
+    const trendValues = Object.values(trendData);
+
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'bar',
+        data: {
+            labels: trendLabels,
+            datasets: [{
+                label: 'Monthly Spending ($)',
+                data: trendValues,
+                backgroundColor: '#36A2EB',
+                borderColor: '#1E88E5',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Amount ($)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `$${context.raw.toFixed(2)}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+<style>
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+    .card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .btn-group .btn.active {
+        background-color: #007bff;
+        color: white;
+    }
+</style>
+{% endblock %}
