@@ -4,10 +4,68 @@ from django.db.models.functions import TruncMonth
 from datetime import datetime, timedelta
 from collections import defaultdict
 from decimal import Decimal
+from abc import ABC, abstractmethod
+
+
+class ChartStrategy(ABC):
+    """Strategy Interface"""
+    @abstractmethod
+    def format_data(self, category_data):
+        pass
+
+class PieChartStrategy(ChartStrategy):
+    """Concrete Strategy for Pie Chart"""
+    def format_data(self, category_data):
+        # Pie chart needs labels and values
+        return {
+            'type': 'pie',
+            'labels': list(category_data.keys()),
+            'values': list(category_data.values()),
+            'options': {'responsive': True}
+        }
+
+class BarChartStrategy(ChartStrategy):
+    """Concrete Strategy for Bar Chart"""
+    def format_data(self, category_data):
+        # Bar chart needs labels and values
+        return {
+            'type': 'bar',
+            'labels': list(category_data.keys()),
+            'values': list(category_data.values()),
+            'options': {'barPercentage': 0.8}
+        }
+
+class LineChartStrategy(ChartStrategy):
+    """Concrete Strategy for Line Chart (for monthly trends)"""
+    def format_data(self, category_data):
+        # Line chart for trends over time
+        return {
+            'type': 'line',
+            'labels': list(category_data.keys()),
+            'values': list(category_data.values()),
+            'options': {'trend': 'smooth'}
+        }
 
 class AnalyticsService:
     """Business logic for insights and analytics"""
+    def __init__(self, strategy=None):
+        """Inject strategy (default: PieChart)"""
+        self._strategy = strategy or PieChartStrategy()
     
+    def set_strategy(self, strategy):
+        """Change strategy at runtime - this is the Strategy pattern!"""
+        self._strategy = strategy
+    
+    def get_chart_data(self, user, chart_type='pie', days=30):
+        """
+        Get formatted chart data using the current strategy
+        Now you can easily switch between chart types!
+        """
+        # Get the raw data
+        category_data = self.get_spending_by_category(user, days)
+        
+        # Apply the strategy to format it
+        return self._strategy.format_data(category_data)
     @staticmethod
     def get_spending_by_category(user, days=30):
         """

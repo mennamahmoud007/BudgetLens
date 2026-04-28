@@ -17,7 +17,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .services.expense_service import ExpenseService
-from .services.analytics_service import AnalyticsService
+from .services.analytics_service import AnalyticsService, BarChartStrategy, LineChartStrategy, PieChartStrategy
 from django.utils import timezone
 
 @login_required
@@ -56,16 +56,37 @@ def dashboard(request):
     # Get filter from URL (default 30 days)
     days = int(request.GET.get('days', 30))
     
-    # Use Analytics Service for all data
-    context = AnalyticsService.get_spending_summary(request.user, days=days)
+    analytics = AnalyticsService()
     
-    # Add recent expenses
-    context['recent_expenses'] = ExpenseService.get_user_expenses(request.user, limit=10)
-    context['selected_days'] = days
+    # Get raw data for charts
+    spending_by_category = AnalyticsService.get_spending_by_category(request.user, days=days)
+    monthly_trend = AnalyticsService.get_monthly_trend(request.user)
     
-    # Add weekly comparison for extra insight
-    context['weekly_comparison'] = AnalyticsService.get_weekly_comparison(request.user)
+    # Generate different chart types using Strategy pattern
+    analytics.set_strategy(PieChartStrategy())
+    pie_chart_data = analytics.get_chart_data(spending_by_category)
     
+    analytics.set_strategy(BarChartStrategy())
+    bar_chart_data = analytics.get_chart_data(spending_by_category)
+    
+    analytics.set_strategy(LineChartStrategy())
+    line_chart_data = analytics.get_chart_data(monthly_trend)
+    context = {
+        # Strategy pattern results (charts)
+        'pie_chart': pie_chart_data,
+        'bar_chart': bar_chart_data,
+        'line_chart': line_chart_data,
+        
+        # Original analytics data
+        'total_spent': AnalyticsService.get_total_spending(request.user, days),
+        'daily_average': AnalyticsService.get_daily_average(request.user, days),
+        'top_categories': AnalyticsService.get_top_categories(request.user, days=days),
+        
+        # Other context
+        'recent_expenses': ExpenseService.get_user_expenses(request.user, limit=10),
+        'selected_days': days,
+        'weekly_comparison': AnalyticsService.get_weekly_comparison(request.user),
+    }
     return render(request, 'budget_app/dashboard.html', context)
 
 @login_required
