@@ -1,11 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">📢 Budget Alerts</h1>
     
-</body>
-</html>
+    {% if alert %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Warning!</strong> {{ alert }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% else %}
+        <div class="alert alert-success" role="alert">
+            <strong>Great!</strong> Your spending is under control. No alerts at this time.
+        </div>
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-header">
+            <h4>Alert Settings</h4>
+        </div>
+        <div class="card-body">
+            <p>Alerts are triggered when you reach 80% of your total budget.</p>
+            <p>Current threshold: 80%</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

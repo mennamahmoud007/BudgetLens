@@ -6,7 +6,6 @@ from collections import defaultdict
 from decimal import Decimal
 from abc import ABC, abstractmethod
 
-
 class ChartStrategy(ABC):
     """Strategy Interface"""
     @abstractmethod

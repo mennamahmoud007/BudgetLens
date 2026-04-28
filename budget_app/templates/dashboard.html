@@ -22,6 +22,60 @@
 </div>
 
 <div class="row">
+    <!-- Budget Cycle Overview -->
+    {% if cycle %}
+    {% if budget_exceeded %}
+    <div class="col-md-12 mb-4">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>⛔ Budget Exceeded!</strong> You have spent <strong>${{ spent|floatformat:2 }}</strong> out of <strong>${{ total_budget|floatformat:2 }}</strong>. 
+            You are over budget by <strong>${{ over_budget_amount|floatformat:2 }}</strong>.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+    {% endif %}
+    <div class="col-md-12 mb-4">
+        <div class="card {% if budget_exceeded %}border-danger{% else %}border-primary{% endif %}">
+            <div class="card-header {% if budget_exceeded %}bg-danger text-white{% else %}bg-primary text-white{% endif %}">
+                <h4>📅 Budget Cycle Overview ({{ cycle.start_date }} to {{ cycle.end_date }})</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h5>Total Budget</h5>
+                        <h3 class="text-primary">${{ total_budget|floatformat:2 }}</h3>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>Already Spent</h5>
+                        <h3 class="text-danger">${{ spent|floatformat:2 }}</h3>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>Remaining</h5>
+                        <h3 class="text-success">${{ remaining_budget|floatformat:2 }}</h3>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>Daily Limit</h5>
+                        <h3 class="text-warning">${{ daily_limit|floatformat:2 }}</h3>
+                    </div>
+                </div>
+                <!-- Progress Bar -->
+                <div class="progress mt-3" style="height: 25px;">
+                    {% widthratio spent total_budget 100 as progress_percent %}
+                    <div class="progress-bar {% if progress_percent >= 80 %}bg-danger{% elif progress_percent >= 50 %}bg-warning{% else %}bg-success{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ progress_percent }}%;" 
+                         aria-valuenow="{{ progress_percent }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        {{ progress_percent }}% Spent
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row">
     <div class="col-md-3">
         <div class="card bg-primary text-white mb-3">
             <div class="card-body">
@@ -34,9 +88,14 @@
     <div class="col-md-3">
         <div class="card bg-info text-white mb-3">
             <div class="card-body">
-                <h5 class="card-title">Daily Average</h5>
-                <h2 class="card-text">${{ daily_average|floatformat:2 }}</h2>
-                <small>per day</small>
+                <h5 class="card-title">Daily Average (Budget)</h5>
+                {% if daily_average_budget %}
+                    <h2 class="card-text">${{ daily_average_budget|floatformat:2 }}</h2>
+                    <small>Remaining ÷ Days Left</small>
+                {% else %}
+                    <h2 class="card-text">-</h2>
+                    <small>No budget cycle</small>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -56,14 +115,23 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-warning text-dark mb-3">
+        <div class="card {% if budget_exceeded %}bg-danger{% elif alert %}bg-warning{% else %}bg-success{% endif %} text-white mb-3">
             <div class="card-body">
-                <h5 class="card-title">Categories</h5>
-                <h2 class="card-text">{{ by_category|length }}</h2>
-                <small>with spending</small>
+                <h5 class="card-title">Alert Status</h5>
+                {% if budget_exceeded %}
+                    <h2 class="card-text">🔴</h2>
+                    <small>Budget Exceeded!</small>
+                {% elif alert %}
+                    <h2 class="card-text">⚠️</h2>
+                    <small>{{ alert }}</small>
+                {% else %}
+                    <h2 class="card-text">✅</h2>
+                    <small>Budget OK</small>
+                {% endif %}
             </div>
         </div>
     </div>
+
 </div>
 
 <div class="row">
@@ -134,7 +202,7 @@
                             {% for expense in recent_expenses %}
                             <tr>
                                 <td>{{ expense.date|date:"M d, Y" }}</td>
-                                <td><span class="badge bg-secondary">{{ expense.category.name }}</span></td>
+                                <td><span class="badge bg-secondary">{{ expense.category.name|default:"Uncategorized" }}</span></td>
                                 <td>{{ expense.description }}</td>
                                 <td class="text-end text-danger">${{ expense.amount }}</td>
                             </tr>
@@ -146,7 +214,7 @@
                         </tbody>
                     </table>
                 </div>
-                <a href="{% url 'expense_list' %}" class="btn btn-sm btn-info">View All Expenses →</a>
+                <a href="{% url 'history' %}" class="btn btn-sm btn-info">View History →</a>
             </div>
         </div>
     </div>
@@ -236,6 +304,7 @@
 
 <style>
     .card { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .btn-group .btn.active { background-color: #007bff; color: white; }
+    .btn-group .btn.active { background-color: #0b6edf; color: white; }
 </style>
 {% endblock %}
+

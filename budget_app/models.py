@@ -18,3 +18,27 @@ class Expense(models.Model):
     
     def __str__(self):
         return f"{self.description} - ${self.amount}"
+
+ 
+class BudgetCycle(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    total_budget = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    @property
+    def spent(self):
+        return sum(expense.amount for expense in Expense.objects.filter(
+            user=self.user,
+            date__range=(self.start_date, self.end_date)
+        ))
+    
+    @property
+    def remaining_budget(self):
+        return self.total_budget - self.spent
+    
+    def __str__(self):
+        return f"Budget Cycle: {self.start_date} to {self.end_date} - ${self.total_budget}"
+ 
+
+

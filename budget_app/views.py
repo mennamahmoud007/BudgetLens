@@ -1,25 +1,50 @@
 # Create your views here.
-from django.shortcuts import render
-from django.http import HttpResponse
-
-# =============================
-# Setup Views (US1)
-# =============================
-
-def setup_view(request):
-    return render(request, 'setup.html')
-
-
-# =============================
-# Expense Views (US2)
-# =============================
-
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+
+from .models import BudgetCycle
 from .services.expense_service import ExpenseService
 from .services.analytics_service import AnalyticsService, BarChartStrategy, LineChartStrategy, PieChartStrategy
-from django.utils import timezone
+from .services.budget_service import recalculate_daily_limit, create_budget_cycle, calculate_daily_average
+from .services.alert_service import check_threshold, trigger_alert
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Account created successfully! Please log in.')
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
+
+from django import forms
+
+class BudgetCycleForm(forms.Form):
+    total_budget = forms.DecimalField(max_digits=10, decimal_places=2, min_value=0.01, label="Monthly Budget Amount")
+    start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Start Date (optional)")
+    end_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="End Date (optional)")
+
+@login_required
+def setup_view(request):
+    if request.method == 'POST':
+        form = BudgetCycleForm(request.POST)
+        if form.is_valid():
+            total_budget = form.cleaned_data['total_budget']
+            start_date = form.cleaned_data.get('start_date')
+            end_date = form.cleaned_data.get('end_date')
+            create_budget_cycle(request.user, total_budget, start_date, end_date)
+            messages.success(request, 'Budget cycle created successfully!')
+            return redirect('dashboard')
+    else:
+        form = BudgetCycleForm()
+    
+    return render(request, 'setup.html', {'form': form})
 
 @login_required
 def add_expense(request):
@@ -72,6 +97,28 @@ def dashboard(request):
     
     analytics.set_strategy(LineChartStrategy())
     line_chart_data = analytics.get_chart_data(monthly_trend)
+    
+    # Budget Cycle data (US5, US6)
+    cycle = BudgetCycle.objects.filter(user=request.user).last()
+    daily_limit = None
+    daily_average_budget = None
+    alert = None
+    budget_exceeded = False
+    over_budget_amount = None
+    
+    if cycle:
+        daily_limit = recalculate_daily_limit(cycle)
+        daily_average_budget = calculate_daily_average(cycle)
+        
+        # Check if budget is exceeded
+        if cycle.spent > cycle.total_budget:
+            budget_exceeded = True
+            over_budget_amount = cycle.spent - cycle.total_budget
+        
+        # Check if reached 80% threshold
+        if check_threshold(cycle.spent, cycle.total_budget):
+            alert = trigger_alert()
+    
     context = {
         # Strategy pattern results (charts)
         'pie_chart': pie_chart_data,
@@ -85,6 +132,17 @@ def dashboard(request):
         'daily_average': AnalyticsService.get_daily_average(request.user, days),
         'top_categories': AnalyticsService.get_top_categories(request.user, days=days),
         
+        # Budget Cycle data
+        'daily_limit': daily_limit,
+        'daily_average_budget': daily_average_budget,
+        'alert': alert,
+        'budget_exceeded': budget_exceeded,
+        'over_budget_amount': over_budget_amount,
+        'cycle': cycle,
+        'total_budget': cycle.total_budget if cycle else None,
+        'spent': cycle.spent if cycle else None,
+        'remaining_budget': cycle.remaining_budget if cycle else None,
+        
         # Other context
         'recent_expenses': ExpenseService.get_user_expenses(request.user, limit=10),
         'selected_days': days,
@@ -94,9 +152,9 @@ def dashboard(request):
 
 @login_required
 def expense_list(request):
-    """View all expenses"""
+    """View all expenses - History"""
     expenses = ExpenseService.get_user_expenses(request.user)
-    return render(request, 'expense_list.html', {'expenses': expenses})
+    return render(request, 'history.html', {'expenses': expenses})
 
 @login_required
 def delete_expense(request, expense_id):
@@ -105,20 +163,14 @@ def delete_expense(request, expense_id):
         messages.success(request, 'Expense deleted successfully!')
     else:
         messages.error(request, ' Expense not found or access denied')
-    return redirect('expense_list')
+    return redirect('history')
 
+@login_required
+def alerts_view(request):
+    cycle = BudgetCycle.objects.filter(user=request.user).last()
+    alert = None
+    if cycle and check_threshold(cycle.spent, cycle.total_budget):
+        alert = trigger_alert()
+    
+    return render(request, 'alerts.html', {'alert': alert, 'cycle': cycle})
 
-# =============================
-# Dashboard Views (US3,4,5)
-# =============================
-
-def dashboard_view(request):
-    pass
-
-
-# =============================
-# History Views (US7)
-# =============================
-
-def history_view(request):
-    pass
