@@ -14,10 +14,6 @@ def setup_view(request):
 # Expense Views (US2)
 # =============================
 
-<<<<<<< HEAD
-def add_expense_view(request):
-    return HttpResponse("Add Expense Page - To be implemented")
-=======
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -110,7 +106,6 @@ def delete_expense(request, expense_id):
     else:
         messages.error(request, ' Expense not found or access denied')
     return redirect('expense_list')
->>>>>>> 449014b8b10bb3389f3212f911c1c72a26a8774f
 
 
 # =============================
