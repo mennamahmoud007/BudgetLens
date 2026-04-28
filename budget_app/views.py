@@ -1,5 +1,6 @@
 # Create your views here.
 from django.shortcuts import render
+from django.http import HttpResponse
 
 # =============================
 # Setup Views (US1)
@@ -14,7 +15,7 @@ def setup_view(request):
 # =============================
 
 def add_expense_view(request):
-    pass
+    return HttpResponse("Add Expense Page - To be implemented")
 
 
 # =============================
