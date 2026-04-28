@@ -48,7 +48,7 @@ def add_expense(request):
         except Exception as e:
             messages.error(request, f'Error adding expense: {str(e)}')
     
-    return render(request, 'budget_app/add_expense.html')
+    return render(request, 'add_expense.html')
 
 @login_required
 def dashboard(request):
@@ -78,6 +78,8 @@ def dashboard(request):
         'line_chart': line_chart_data,
         
         # Original analytics data
+        'by_category': spending_by_category,        
+        'monthly_trend': monthly_trend,
         'total_spent': AnalyticsService.get_total_spending(request.user, days),
         'daily_average': AnalyticsService.get_daily_average(request.user, days),
         'top_categories': AnalyticsService.get_top_categories(request.user, days=days),
@@ -87,13 +89,13 @@ def dashboard(request):
         'selected_days': days,
         'weekly_comparison': AnalyticsService.get_weekly_comparison(request.user),
     }
-    return render(request, 'budget_app/dashboard.html', context)
+    return render(request, 'dashboard.html', context)
 
 @login_required
 def expense_list(request):
     """View all expenses"""
     expenses = ExpenseService.get_user_expenses(request.user)
-    return render(request, 'budget_app/expense_list.html', {'expenses': expenses})
+    return render(request, 'expense_list.html', {'expenses': expenses})
 
 @login_required
 def delete_expense(request, expense_id):

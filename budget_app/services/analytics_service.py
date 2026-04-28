@@ -56,16 +56,11 @@ class AnalyticsService:
         """Change strategy at runtime - this is the Strategy pattern!"""
         self._strategy = strategy
     
-    def get_chart_data(self, user, chart_type='pie', days=30):
-        """
-        Get formatted chart data using the current strategy
-        Now you can easily switch between chart types!
-        """
-        # Get the raw data
-        category_data = self.get_spending_by_category(user, days)
-        
-        # Apply the strategy to format it
-        return self._strategy.format_data(category_data)
+    
+    def get_chart_data(self, data):
+        """Accept pre-fetched data dict and format it with current strategy"""
+        return self._strategy.format_data(data)
+    
     @staticmethod
     def get_spending_by_category(user, days=30):
         """
