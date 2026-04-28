@@ -30,4 +30,5 @@ urlpatterns = [
     path('', views.dashboard, name='dashboard'),
     path('add/', views.add_expense, name='add_expense'),
     path('list/', views.expense_list, name='expense_list'),
+    path('', include('budget_app.urls')),
 ]
