@@ -1,16 +1,22 @@
 # Create your views here.
+from urllib import request
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-
+from django.contrib.auth.forms import AuthenticationForm
 from .models import BudgetCycle
 from .services.expense_service import ExpenseService
 from .services.analytics_service import AnalyticsService, BarChartStrategy, LineChartStrategy, PieChartStrategy
 from .services.budget_service import recalculate_daily_limit, create_budget_cycle, calculate_daily_average
 from .services.alert_service import check_threshold, trigger_alert
 from .services.budget_service import reset_budget_cycle
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from .forms import StyledSignUpForm
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -181,3 +187,24 @@ def reset_cycle_view(request):
         return redirect('setup')
     
     return redirect('dashboard')
+class StyledLoginForm(AuthenticationForm):
+    username = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Enter username'
+    }))
+
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Enter password'
+    }))
+def signup_view(request):
+    if request.method == "POST":
+        form = StyledSignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('dashboard')
+    else:
+        form = StyledSignUpForm()
+
+    return render(request, 'registration/signup.html', {'form': form})
