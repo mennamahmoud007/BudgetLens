@@ -1,7 +1,9 @@
 # Create your views here.
 from urllib import request
 from .models import Feedback
-
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import BudgetCycle, Expense
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -222,8 +224,36 @@ def feedback_view(request):
         form = FeedbackForm()
 
     feedbacks = Feedback.objects.all().order_by('-id')
+    feedbacks = Feedback.objects.all().order_by('-created_at')
 
     return render(request, 'feedback.html', {
         'form': form,
         'feedbacks': feedbacks
+    })
+@login_required
+def chatbot_response(request):
+    message = request.GET.get("message", "").lower()
+
+    cycle = BudgetCycle.objects.filter(user=request.user).last()
+    total_spent = Expense.objects.filter(user=request.user).count()
+
+    if "budget" in message:
+        if cycle:
+            return JsonResponse({
+                "reply": f"Your total budget is {cycle.total_budget} and you spent {cycle.spent}."
+            })
+        return JsonResponse({"reply": "No budget found yet."})
+
+    if "expense" in message:
+        return JsonResponse({
+            "reply": f"You have {total_spent} recorded expenses."
+        })
+
+    if "tip" in message:
+        return JsonResponse({
+            "reply": "Try to reduce food expenses by 10% this month 💡"
+        })
+
+    return JsonResponse({
+        "reply": "I can help you with budget, expenses, and tips 👍"
     })

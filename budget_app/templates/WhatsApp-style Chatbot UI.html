@@ -1,0 +1,153 @@
+<style>
+    #chatbot-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #25D366;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    #chatbox {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 320px;
+        height: 420px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #chat-header {
+        background: #25D366;
+        color: white;
+        padding: 10px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    #chat-body {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        background: #f5f5f5;
+    }
+
+    .message {
+        padding: 8px 12px;
+        margin: 5px 0;
+        border-radius: 10px;
+        max-width: 80%;
+        font-size: 14px;
+    }
+
+    .user-msg {
+        background: #dcf8c6;
+        margin-left: auto;
+        text-align: right;
+    }
+
+    .bot-msg {
+        background: white;
+        border: 1px solid #ddd;
+    }
+
+    #chat-input {
+        display: flex;
+        border-top: 1px solid #ddd;
+    }
+
+    #chat-input input {
+        flex: 1;
+        border: none;
+        padding: 10px;
+        outline: none;
+    }
+
+    #chat-input button {
+        background: #25D366;
+        border: none;
+        color: white;
+        padding: 10px 15px;
+        cursor: pointer;
+    }
+</style>
+
+<button id="chatbot-toggle" onclick="toggleChat()">💬</button>
+
+<div id="chatbox">
+    <div id="chat-header">BudgetLens Assistant</div>
+
+    <div id="chat-body" id="messages">
+        <div class="message bot-msg">Hello 👋 How can I help you with your expenses?</div>
+    </div>
+
+    <div id="chat-input">
+        <input type="text" id="userInput" placeholder="Type a message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    function toggleChat() {
+        var box = document.getElementById("chatbox");
+        box.style.display = (box.style.display === "flex") ? "none" : "flex";
+    }
+
+    function sendMessage() {
+        var input = document.getElementById("userInput");
+        var message = input.value;
+        if (message.trim() === "") return;
+
+        var chatBody = document.getElementById("chat-body");
+
+        var userMsg = document.createElement("div");
+        userMsg.className = "message user-msg";
+        userMsg.innerText = message;
+        chatBody.appendChild(userMsg);
+
+        var botMsg = document.createElement("div");
+        botMsg.className = "message bot-msg";
+
+        if (message.toLowerCase().includes("budget")) {
+            botMsg.innerText = "Your budget info is in the dashboard 📊";
+        } else if (message.toLowerCase().includes("expense")) {
+            botMsg.innerText = "You can add expenses from the Add Expense page 💰";
+        } else {
+            botMsg.innerText = "I'm here to help you manage your finances 👍";
+        }
+
+        chatBody.appendChild(botMsg);
+
+        input.value = "";
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+    function sendMessage() {
+        let input = document.getElementById("userInput");
+        let message = input.value;
+        if (!message) return;
+
+        let chatBody = document.getElementById("chat-body");
+
+        chatBody.innerHTML += `<div class="message user-msg">${message}</div>`;
+
+        fetch(`/chatbot/?message=${message}`)
+            .then(res => res.json())
+            .then(data => {
+                chatBody.innerHTML += `<div class="message bot-msg">${data.reply}</div>`;
+                chatBody.scrollTop = chatBody.scrollHeight;
+            });
+
+        input.value = "";
+    }
+</script>

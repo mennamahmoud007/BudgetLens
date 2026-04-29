@@ -17,5 +17,6 @@ urlpatterns = [
         authentication_form=views.StyledLoginForm
     ), name="login"),
     path('feedback/', views.feedback_view, name='feedback'),
+    path('chatbot/', views.chatbot_response, name='chatbot'),
 ]
 

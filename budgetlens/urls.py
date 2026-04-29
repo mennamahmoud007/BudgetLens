@@ -15,4 +15,5 @@ urlpatterns = [
      path('accounts/signup/', views.signup_view, name='signup'),
      path('feedback/', views.feedback_view, name='feedback'),
      path('feedback/', views.feedback_view, name='feedback'),
+     path('chatbot/', views.chatbot_response, name='chatbot'),
 ]
