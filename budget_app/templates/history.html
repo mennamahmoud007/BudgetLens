@@ -21,7 +21,7 @@
                     {% for expense in expenses %}
                     <tr>
                         <td>{{ expense.date|date:"M d, Y" }}</td>
-                        <td><span class="badge bg-secondary">{{ expense.category.name|default:"Uncategorized" }}</span></td>
+                        <td><span class="badge bg-secondary">{{ expense.category.name | default:"Uncategorized" }}</span></td>
                         <td>{{ expense.description }}</td>
                         <td class="text-end text-danger">${{ expense.amount }}</td>
                     </tr>

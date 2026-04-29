@@ -111,8 +111,7 @@
                 <h2 class="card-text">${{ weekly_comparison.this_week|floatformat:2 }}</h2>
                 {% if weekly_comparison.percent_change > 0 %}
                 <small class="text-warning">↑ {{ weekly_comparison.percent_change|floatformat:1 }}% vs last week</small>
-                {% elif weekly_comparison.percent_change < 0 %} <small class="text-light">↓ {{
-                    weekly_comparison.percent_change|floatformat:1 }}% vs last week</small>
+                {% elif weekly_comparison.percent_change < 0 %} <small class="text-light">↓ {{weekly_comparison.percent_change | floatformat:1 }}% vs last week</small>
                     {% else %}
                     <small>Same as last week</small>
                     {% endif %}
@@ -208,8 +207,7 @@
                             {% for expense in recent_expenses %}
                             <tr>
                                 <td>{{ expense.date|date:"M d, Y" }}</td>
-                                <td><span class="badge bg-secondary">{{ expense.category.name|default:"Uncategorized"
-                                        }}</span></td>
+                                <td><span class="badge bg-secondary">{{ expense.category.name | default:"Uncategorized"}}</span></td>
                                 <td>{{ expense.description }}</td>
                                 <td class="text-end text-danger">${{ expense.amount }}</td>
                             </tr>
