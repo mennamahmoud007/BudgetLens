@@ -16,5 +16,6 @@ urlpatterns = [
     path("login/", auth_views.LoginView.as_view(
         authentication_form=views.StyledLoginForm
     ), name="login"),
+    path('feedback/', views.feedback_view, name='feedback'),
 ]
 

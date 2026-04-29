@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    @keyframes fadeSlide {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .feedback-card {
+        animation: fadeSlide 0.6s ease;
+        border-radius: 20px;
+    }
+
+    .star-rating {
+        direction: rtl;
+        font-size: 25px;
+    }
+
+    .star-rating input {
+        display: none;
+    }
+
+    .star-rating label {
+        color: #ccc;
+        cursor: pointer;
+    }
+
+    .star-rating input:checked~label,
+    .star-rating label:hover,
+    .star-rating label:hover~label {
+        color: gold;
+    }
+
+    .btn-custom:hover {
+        transform: scale(1.05);
+        transition: 0.2s;
+    }
+</style>
+
+<div class="container mt-5">
+
+    <div class="text-center mb-4">
+        <button class="btn btn-primary btn-lg" onclick="toggleForm()">
+            ➕ Add Feedback
+        </button>
+    </div>
+
+    <div id="feedbackForm" style="display: none;" class="row justify-content-center">
+        <div class="col-md-5">
+
+            <div class="card shadow-lg p-4 feedback-card">
+                <h3 class="text-center mb-3">💬 Send Feedback</h3>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <input type="text" name="name" class="form-control mb-3" placeholder="Your name (optional)">
+
+                    <textarea name="message" class="form-control mb-3" rows="4" placeholder="Write your feedback..."
+                        required></textarea>
+
+                    <div class="star-rating text-center mb-3">
+                        <input type="radio" name="rating" value="5" id="star5"><label for="star5">★</label>
+                        <input type="radio" name="rating" value="4" id="star4"><label for="star4">★</label>
+                        <input type="radio" name="rating" value="3" id="star3"><label for="star3">★</label>
+                        <input type="radio" name="rating" value="2" id="star2"><label for="star2">★</label>
+                        <input type="radio" name="rating" value="1" id="star1"><label for="star1">★</label>
+                    </div>
+
+                    <button class="btn btn-primary w-100 btn-custom">Submit</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-8 mx-auto">
+            <h4 class="mb-3">📢 Users Feedback</h4>
+
+            {% for fb in feedbacks %}
+            <div class="card p-3 mb-3 shadow-sm">
+                <strong>{{ fb.name|default:"Anonymous" }}</strong>
+                <p>{{ fb.message }}</p>
+                <div>
+                    {% for i in "12345"|slice:":fb.rating"|make_list %}
+                    ⭐
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <p>No feedback yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggleForm() {
+        var form = document.getElementById("feedbackForm");
+        form.style.display = form.style.display === "none" ? "block" : "none";
+    }
+</script>
+
+{% endblock %}

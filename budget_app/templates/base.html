@@ -23,6 +23,7 @@
                 <a href="{% url 'history' %}" class="btn btn-info btn-sm">History</a>
                 <a href="{% url 'alerts' %}" class="btn btn-warning btn-sm">Alerts</a>
                 <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                    <a href="{% url 'feedback' %}" class="btn btn-primary btn-sm">Feedback</a>
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger btn-sm">Logout</button>
                 </form>

@@ -1,5 +1,6 @@
 # Create your views here.
 from urllib import request
+from .models import Feedback
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -16,7 +17,7 @@ from .services.budget_service import reset_budget_cycle
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from .forms import StyledSignUpForm
+from .forms import FeedbackForm, StyledSignUpForm
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -208,3 +209,21 @@ def signup_view(request):
         form = StyledSignUpForm()
 
     return render(request, 'registration/signup.html', {'form': form})
+
+def feedback_view(request):
+    if request.method == "POST":
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Thank you for your feedback!")
+            return redirect('feedback')
+
+    else:
+        form = FeedbackForm()
+
+    feedbacks = Feedback.objects.all().order_by('-id')
+
+    return render(request, 'feedback.html', {
+        'form': form,
+        'feedbacks': feedbacks
+    })

@@ -13,4 +13,6 @@ urlpatterns = [
         authentication_form=StyledLoginForm
     ), name="login"),
      path('accounts/signup/', views.signup_view, name='signup'),
+     path('feedback/', views.feedback_view, name='feedback'),
+     path('feedback/', views.feedback_view, name='feedback'),
 ]

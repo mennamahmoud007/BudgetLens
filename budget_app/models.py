@@ -39,6 +39,15 @@ class BudgetCycle(models.Model):
     
     def __str__(self):
         return f"Budget Cycle: {self.start_date} to {self.end_date} - ${self.total_budget}"
- 
+    
+   
+class Feedback(models.Model):
+    name = models.CharField(max_length=100, blank=True, null=True)
+    message = models.TextField()
+    rating = models.IntegerField(default=5)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.message[:30]
 
 
