@@ -33,3 +33,10 @@ def calculate_daily_average(cycle):
     
     daily_average = cycle.remaining_budget / remaining_days
     return daily_average
+from ..models import BudgetCycle
+
+def reset_budget_cycle(user):
+    cycle = BudgetCycle.objects.filter(user=user).last()
+    
+    if cycle:
+        cycle.delete()  
