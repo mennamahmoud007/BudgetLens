@@ -10,7 +10,7 @@ from .services.expense_service import ExpenseService
 from .services.analytics_service import AnalyticsService, BarChartStrategy, LineChartStrategy, PieChartStrategy
 from .services.budget_service import recalculate_daily_limit, create_budget_cycle, calculate_daily_average
 from .services.alert_service import check_threshold, trigger_alert
-
+from .services.budget_service import reset_budget_cycle
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -173,4 +173,11 @@ def alerts_view(request):
         alert = trigger_alert()
     
     return render(request, 'alerts.html', {'alert': alert, 'cycle': cycle})
-
+@login_required
+def reset_cycle_view(request):
+    if request.method == "POST":
+        reset_budget_cycle(request.user)
+        messages.success(request, "Budget cycle reset successfully!")
+        return redirect('setup')
+    
+    return redirect('dashboard')
