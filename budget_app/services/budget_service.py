@@ -5,7 +5,6 @@ def create_budget_cycle(user, total_budget, start_date=None, end_date=None):
     if start_date is None:
         start_date = timezone.now().date()
     if end_date is None:
-        # Default to end of month
         end_date = start_date.replace(day=28) + timezone.timedelta(days=4)  
         end_date = end_date - timezone.timedelta(days=end_date.day)
     
