@@ -1,25 +1,37 @@
 # Create your views here.
-from urllib import request
-from .models import Feedback
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from .models import BudgetCycle, Expense
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
+from django import forms
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.forms import AuthenticationForm
-from .models import BudgetCycle
-from .services.expense_service import ExpenseService
-from .services.analytics_service import AnalyticsService, BarChartStrategy, LineChartStrategy, PieChartStrategy
-from .services.budget_service import recalculate_daily_limit, create_budget_cycle, calculate_daily_average
-from .services.alert_service import check_threshold, trigger_alert
-from .services.budget_service import reset_budget_cycle
-
-from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from .forms import FeedbackForm, StyledSignUpForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
+
+from .forms import (
+    ExpenseEditForm,
+    ExpenseFilterForm,
+    FeedbackForm,
+    GoalDepositForm,
+    SavingGoalForm,
+    StyledSignUpForm,
+)
+from .models import BudgetCycle, Expense, Feedback, SavingGoal
+from .services.alert_service import check_threshold, trigger_alert
+from .services.analytics_service import (
+    AnalyticsService,
+    BarChartStrategy,
+    LineChartStrategy,
+    PieChartStrategy,
+)
+from .services.budget_service import (
+    BudgetCalculator,
+    calculate_daily_average,
+    create_budget_cycle,
+    recalculate_daily_limit,
+    reset_budget_cycle,
+)
+from .services.expense_service import ExpenseService
+
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -31,8 +43,6 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
 
-
-from django import forms
 
 class BudgetCycleForm(forms.Form):
     total_budget = forms.DecimalField(max_digits=10, decimal_places=2, min_value=0.01, label="Monthly Budget Amount")
@@ -74,7 +84,10 @@ def add_expense(request):
                 description=description,
                 date=date_str if date_str else None
             )
-            
+
+            cycle = BudgetCycle.objects.filter(user=request.user).last()
+            if cycle:
+                BudgetCalculator.apply_daily_rollover(cycle)
             messages.success(request, f'Added: ${expense.amount} for {expense.description}')
             return redirect('dashboard')
             
@@ -114,16 +127,16 @@ def dashboard(request):
     alert = None
     budget_exceeded = False
     over_budget_amount = None
-    
     if cycle:
+        cycle = BudgetCalculator.apply_daily_rollover(cycle)
         daily_limit = recalculate_daily_limit(cycle)
         daily_average_budget = calculate_daily_average(cycle)
-        
+
         # Check if budget is exceeded
         if cycle.spent > cycle.total_budget:
             budget_exceeded = True
             over_budget_amount = cycle.spent - cycle.total_budget
-        
+
         # Check if reached 80% threshold
         if check_threshold(cycle.spent, cycle.total_budget):
             alert = trigger_alert()
@@ -161,9 +174,25 @@ def dashboard(request):
 
 @login_required
 def expense_list(request):
-    """View all expenses - History"""
     expenses = ExpenseService.get_user_expenses(request.user)
-    return render(request, 'history.html', {'expenses': expenses})
+    form = ExpenseFilterForm(request.GET or None)
+
+    if form.is_valid():
+        category = form.cleaned_data.get("category")
+        start_date = form.cleaned_data.get("start_date")
+        end_date = form.cleaned_data.get("end_date")
+
+        if category:
+            expenses = expenses.filter(category=category)
+        if start_date:
+            expenses = expenses.filter(date__gte=start_date)
+        if end_date:
+            expenses = expenses.filter(date__lte=end_date)
+
+    return render(request, 'history.html', {
+        'expenses': expenses,
+        'filter_form': form,
+    })
 
 @login_required
 def delete_expense(request, expense_id):
@@ -174,6 +203,26 @@ def delete_expense(request, expense_id):
         messages.error(request, ' Expense not found or access denied')
     return redirect('history')
 
+@login_required
+def edit_expense(request, expense_id):
+    expense = ExpenseService.get_expense_by_id(expense_id, request.user)
+    if not expense:
+        messages.error(request, "Expense not found or access denied.")
+        return redirect("history")
+
+    if request.method == "POST":
+        form = ExpenseEditForm(request.POST, instance=expense)
+        if form.is_valid():
+            form.save()
+            cycle = BudgetCycle.objects.filter(user=request.user).last()
+            if cycle:
+                BudgetCalculator.apply_daily_rollover(cycle)
+            messages.success(request, "Expense updated successfully!")
+            return redirect("history")
+    else:
+        form = ExpenseEditForm(instance=expense)
+
+    return render(request, "edit_expense.html", {"form": form, "expense": expense})
 @login_required
 def alerts_view(request):
     cycle = BudgetCycle.objects.filter(user=request.user).last()
@@ -257,3 +306,48 @@ def chatbot_response(request):
     return JsonResponse({
         "reply": "I can help you with budget, expenses, and tips 👍"
     })
+
+
+@login_required
+def goals_list(request):
+    goals = SavingGoal.objects.filter(user=request.user).order_by("-created_at")
+    return render(request, "Goals.html", {"goals": goals})
+
+
+@login_required
+def add_goal(request):
+    if request.method == "POST":
+        form = SavingGoalForm(request.POST)
+        if form.is_valid():
+            goal = form.save(commit=False)
+            goal.user = request.user
+            goal.save()
+            messages.success(request, "Goal created successfully!")
+            return redirect("goals")
+    else:
+        form = SavingGoalForm()
+    return render(request, "add_goal.html", {"form": form})
+
+
+@login_required
+def deposit_goal(request, goal_id):
+    goal = SavingGoal.objects.filter(id=goal_id, user=request.user).first()
+    if not goal:
+        messages.error(request, "Goal not found.")
+        return redirect("goals")
+
+    if request.method == "POST":
+        form = GoalDepositForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data["amount"]
+            goal.current_amount += amount
+            if goal.current_amount >= goal.target_amount:
+                goal.current_amount = goal.target_amount
+                goal.is_completed = True
+            goal.save()
+            messages.success(request, "Deposit added to goal.")
+            return redirect("goals")
+    else:
+        form = GoalDepositForm()
+
+    return render(request, "gaol_deposit.html", {"goal": goal, "form": form})

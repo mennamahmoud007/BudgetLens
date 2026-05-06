@@ -25,6 +25,9 @@ class BudgetCycle(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     total_budget = models.DecimalField(max_digits=10, decimal_places=2)
+    remaining_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    daily_limit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    last_recalculated_date = models.DateField(null=True, blank=True)
     
     @property
     def spent(self):
@@ -50,4 +53,20 @@ class Feedback(models.Model):
     def __str__(self):
         return self.message[:30]
 
+class SavingGoal(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=120)
+    target_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    current_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    deadline = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_completed = models.BooleanField(default=False)
 
+    @property
+    def progress_percent(self):
+        if self.target_amount <= 0:
+            return 0
+        return min(100, int((self.current_amount / self.target_amount) * 100))
+
+    def __str__(self):
+        return f"{self.title} ({self.current_amount}/{self.target_amount})"

@@ -1,12 +1,21 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card">
+<div class="card mb-3">
     <div class="card-header">
-        <h3>📜 Expense History</h3>
+        <h3>Expense History</h3>
         <a href="{% url 'add_expense' %}" class="btn btn-success btn-sm float-end">+ Add New</a>
     </div>
     <div class="card-body">
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-4">{{ filter_form.category }}</div>
+            <div class="col-md-3">{{ filter_form.start_date }}</div>
+            <div class="col-md-3">{{ filter_form.end_date }}</div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead>
@@ -15,28 +24,27 @@
                         <th>Category</th>
                         <th>Description</th>
                         <th class="text-end">Amount</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for expense in expenses %}
                     <tr>
                         <td>{{ expense.date|date:"M d, Y" }}</td>
-                        <td><span class="badge bg-secondary">{{ expense.category.name | default:"Uncategorized" }}</span></td>
+                        <td>{{ expense.category.name|default:"Uncategorized" }}</td>
                         <td>{{ expense.description }}</td>
                         <td class="text-end text-danger">${{ expense.amount }}</td>
+                        <td>
+                            <a href="{% url 'edit_expense' expense.id %}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="{% url 'delete_expense' expense.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" class="text-center">No expenses yet. <a href="{% url 'add_expense' %}">Add your first expense!</a></td>
+                        <td colspan="5" class="text-center">No expenses found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
-                <tfoot>
-                    <tr class="table-info">
-                        <td colspan="3"><strong>Total Expenses</strong></td>
-                        <td class="text-end"><strong>{{ expenses|length|default:0 }}</strong></td>
-                    </tr>
-                </tfoot>
             </table>
         </div>
     </div>

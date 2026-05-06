@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Saving Goals</h3>
+        <a href="{% url 'add_goal' %}" class="btn btn-success btn-sm float-end">+ Add Goal</a>
+    </div>
+    <div class="card-body">
+        {% for goal in goals %}
+        <div class="mb-3 p-2 border rounded">
+            <h5>{{ goal.title }}</h5>
+            <p>Saved: {{ goal.current_amount }} / {{ goal.target_amount }}</p>
+            <p>Progress: {{ goal.progress_percent }}%</p>
+            <a href="{% url 'deposit_goal' goal.id %}" class="btn btn-sm btn-primary">Add Deposit</a>
+        </div>
+        {% empty %}
+        <p>No goals yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
