@@ -1,4 +1,5 @@
 # Create your views here.
+from datetime import timedelta
 from django import forms
 from django.contrib import messages
 from django.contrib.auth import login
@@ -7,6 +8,16 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from django.utils.timezone import now
+from datetime import timedelta
+from .models import Expense, BudgetCycle
+from collections import defaultdict
+from django.db.models import Sum
+
 from .forms import (
     ExpenseEditForm,
     ExpenseFilterForm,
@@ -395,3 +406,74 @@ def delete_goal(request, goal_id):
         goal.delete()
         messages.success(request, "Goal deleted successfully.")
     return redirect("goals")
+
+
+
+def export_weekly_report(request):
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="BudgetLens_Statement.pdf"'
+
+    p = canvas.Canvas(response)
+
+    # ================= PERIOD =================
+    end_date = now().date()
+    start_date = end_date - timedelta(days=7)
+
+    expenses = Expense.objects.filter(
+        user=request.user,
+        date__range=[start_date, end_date]
+    )
+
+    total_expenses = expenses.aggregate(total=Sum('amount'))['total'] or 0
+
+    # ====== Group by category ======
+    by_category = defaultdict(float)
+    for e in expenses:
+        by_category[e.category.name] += float(e.amount)
+
+    # ================= HEADER =================
+    p.setFont("Helvetica-Bold", 22)
+    p.drawCentredString(300, 800, " BudgetLens Bank Statement ")
+
+    p.setFont("Helvetica", 10)
+    p.drawCentredString(300, 785, f"Period: {start_date} → {end_date}")
+
+    p.line(50, 770, 550, 770)
+
+    # ================= SUMMARY BOX =================
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(60, 740, "Account Summary")
+
+    p.setFont("Helvetica", 12)
+    p.drawString(60, 720, f"Total Spending: {total_expenses:.2f} EGP")
+    p.drawString(60, 700, f"Number of Transactions: {expenses.count()}")
+
+    # ================= CATEGORY BREAKDOWN =================
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(60, 660, "Where Your Money Went")
+
+    y = 630
+    p.setFont("Helvetica", 12)
+
+    if not by_category:
+        p.drawString(60, y, "No transactions in this period.")
+    else:
+        for cat, amount in by_category.items():
+            p.drawString(60, y, f"{cat}")
+            p.drawRightString(500, y, f"{amount:.2f} EGP")
+            y -= 22
+
+    # ================= FOOTER =================
+    p.line(50, 80, 550, 80)
+
+    p.setFont("Helvetica-Oblique", 9)
+    p.drawCentredString(300, 60, "Auto-generated financial report by BudgetLens")
+
+    p.setFont("Helvetica", 8)
+    p.drawCentredString(300, 45, f"Generated on {now().strftime('%Y-%m-%d %H:%M')}")
+
+    p.showPage()
+    p.save()
+
+    return response

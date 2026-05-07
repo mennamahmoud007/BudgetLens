@@ -21,4 +21,5 @@ urlpatterns = [
     path("goals/<int:goal_id>/deposit/", views.deposit_goal, name="deposit_goal"),
     path('budget/edit/', views.edit_budget, name='edit_budget'),
     path("goals/<int:goal_id>/delete/", views.delete_goal, name="delete_goal"),
+    path('export-report/', views.export_weekly_report, name='export_report'),
 ]
