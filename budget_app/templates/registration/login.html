@@ -11,6 +11,14 @@
             <h3 class="mt-2">Login</h3>
         </div>
 
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <form method="post">
             {% csrf_token %}
 
@@ -19,6 +27,9 @@
                     <i class="bi bi-person"></i> Username
                 </label>
                 {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <div class="mb-3">
@@ -26,6 +37,9 @@
                     <i class="bi bi-lock"></i> Password
                 </label>
                 {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <button type="submit" class="btn btn-primary w-100">
