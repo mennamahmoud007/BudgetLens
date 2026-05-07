@@ -1,4 +1,3 @@
-
 from decimal import Decimal
 from django.utils import timezone
 from ..models import BudgetCycle, Expense
@@ -15,23 +14,13 @@ class BudgetCalculator:
     def apply_daily_rollover(cycle):
         today = timezone.now().date()
 
-        # avoid recalculating multiple times in same day
-        if cycle.last_recalculated_date == today:
-            return cycle
-
-        # spent from start of cycle until today (or cycle end if today passed)
         effective_end = min(today, cycle.end_date)
         spent = Expense.objects.filter(
             user=cycle.user,
             date__range=(cycle.start_date, effective_end)
         ).aggregate(total=Sum("amount"))["total"] or Decimal("0.00")
 
-
         cycle.remaining_balance = cycle.total_budget - spent
-        remaining_days = (cycle.end_date - today).days + 1
-        cycle.daily_limit = BudgetCalculator.calculate_daily_limit(
-            cycle.remaining_balance, remaining_days
-        )
         cycle.last_recalculated_date = today
         cycle.save()
         return cycle
@@ -55,7 +44,7 @@ def create_budget_cycle(user, total_budget, start_date=None, end_date=None):
         end_date=end_date,
         total_budget=total_budget,
         remaining_balance=total_budget,
-        daily_limit=daily_limit,
+        daily_limit=daily_limit,  
         last_recalculated_date=start_date
     )
     return cycle
