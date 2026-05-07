@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        h3 {
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>BudgetLens Weekly Report</h1>
+
+    <h3>Summary</h3>
+
+    <table>
+
+        <tr>
+            <th>Total Income</th>
+            <th>Total Expenses</th>
+            <th>Remaining</th>
+        </tr>
+
+        <tr>
+            <td>{{ income }} EGP</td>
+            <td>{{ expenses }} EGP</td>
+            <td>{{ remaining }} EGP</td>
+        </tr>
+
+    </table>
+
+    <h3>Expenses By Category</h3>
+
+    <table>
+
+        <tr>
+            <th>Food</th>
+            <th>Transport</th>
+            <th>Shopping</th>
+        </tr>
+
+        <tr>
+            <td>{{ food }} EGP</td>
+            <td>{{ transport }} EGP</td>
+            <td>{{ shopping }} EGP</td>
+        </tr>
+
+    </table>
+
+</body>
+
+</html>
