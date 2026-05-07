@@ -12,6 +12,9 @@
             <p>Saved: {{ goal.current_amount }} / {{ goal.target_amount }}</p>
             <p>Progress: {{ goal.progress_percent }}%</p>
             <a href="{% url 'deposit_goal' goal.id %}" class="btn btn-sm btn-primary">Add Deposit</a>
+            <a href="{% url 'delete_goal' goal.id %}" class="btn btn-sm btn-danger"
+               onclick="return confirm('Are you sure?')">Delete</a>
+
         </div>
         {% empty %}
         <p>No goals yet.</p>

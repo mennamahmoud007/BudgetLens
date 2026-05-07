@@ -2,3 +2,17 @@ __pycache__/
 *.pyc 
 db.sqlite3 
 __pycache__/ 
+.vs/
+__pycache__/
+*.pyc
+db.sqlite3 
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.vs/
+
+db.sqlite3
+
+.env

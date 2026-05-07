@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
-
+from django.utils import timezone
 from .forms import (
     ExpenseEditForm,
     ExpenseFilterForm,
@@ -14,8 +14,9 @@ from .forms import (
     GoalDepositForm,
     SavingGoalForm,
     StyledSignUpForm,
+    BudgetCycleForm,
 )
-from .models import BudgetCycle, Expense, Feedback, SavingGoal
+from .models import BudgetCycle, Expense, Feedback, SavingGoal, Category
 from .services.alert_service import check_threshold, trigger_alert
 from .services.analytics_service import (
     AnalyticsService,
@@ -44,10 +45,7 @@ def signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 
-class BudgetCycleForm(forms.Form):
-    total_budget = forms.DecimalField(max_digits=10, decimal_places=2, min_value=0.01, label="Monthly Budget Amount")
-    start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Start Date (optional)")
-    end_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="End Date (optional)")
+
 
 @login_required
 def setup_view(request):
@@ -67,34 +65,27 @@ def setup_view(request):
 
 @login_required
 def add_expense(request):
-    """Add a new expense - uses ExpenseService"""
     if request.method == 'POST':
-        try:
-            # Get data from form
-            amount = float(request.POST.get('amount'))
-            category_name = request.POST.get('category')
-            description = request.POST.get('description')
-            date_str = request.POST.get('date')
-            
-            # Use service to add expense
-            expense = ExpenseService.add_expense(
-                user=request.user,
-                category_name=category_name,
-                amount=amount,
-                description=description,
-                date=date_str if date_str else None
-            )
+        amount = request.POST.get('amount')
+        category_choice = request.POST.get('category')
+        new_category_name = request.POST.get('new_category_name')
+        description = request.POST.get('description')
+        date_val = request.POST.get('date') or timezone.now().date()
 
-            cycle = BudgetCycle.objects.filter(user=request.user).last()
-            if cycle:
-                BudgetCalculator.apply_daily_rollover(cycle)
-            messages.success(request, f'Added: ${expense.amount} for {expense.description}')
-            return redirect('dashboard')
-            
-        except ValueError as e:
-            messages.error(request, f'Validation Error: {str(e)}')
-        except Exception as e:
-            messages.error(request, f'Error adding expense: {str(e)}')
+        # Logic for new category
+        if category_choice == "__new__" and new_category_name:
+            category_obj, created = Category.objects.get_or_create(name=new_category_name)
+        else:
+            category_obj, created = Category.objects.get_or_create(name=category_choice)
+
+        Expense.objects.create(
+            user=request.user,
+            category=category_obj,
+            amount=amount,
+            description=description,
+            date=date_val
+        )
+        return redirect('dashboard')
     
     return render(request, 'add_expense.html')
 
@@ -119,6 +110,8 @@ def dashboard(request):
     
     analytics.set_strategy(LineChartStrategy())
     line_chart_data = analytics.get_chart_data(monthly_trend)
+
+    goals = SavingGoal.objects.filter(user=request.user)
     
     # Budget Cycle data (US5, US6)
     cycle = BudgetCycle.objects.filter(user=request.user).last()
@@ -169,6 +162,7 @@ def dashboard(request):
         'recent_expenses': ExpenseService.get_user_expenses(request.user, limit=10),
         'selected_days': days,
         'weekly_comparison': AnalyticsService.get_weekly_comparison(request.user),
+        'active_goals': goals.filter(is_completed=False)[:3],
     }
     return render(request, 'dashboard.html', context)
 
@@ -345,9 +339,59 @@ def deposit_goal(request, goal_id):
                 goal.current_amount = goal.target_amount
                 goal.is_completed = True
             goal.save()
-            messages.success(request, "Deposit added to goal.")
+
+            category, _ = Category.objects.get_or_create(name="Savings/Goals")
+            Expense.objects.create(
+                user=request.user,
+                category=category,
+                amount=amount,
+                description=f"Deposit to goal: {goal.title}",
+                date=timezone.now()
+            )
+            messages.success(request, "Deposit added to goal and recorded as expense.")
             return redirect("goals")
     else:
         form = GoalDepositForm()
 
-    return render(request, "gaol_deposit.html", {"goal": goal, "form": form})
+    return render(request, "goal_deposit.html", {"goal": goal, "form": form})
+
+    if form.is_valid():
+        amount = form.cleaned_data["amount"]
+        goal.current_amount += amount
+        goal.save()
+
+        # Automatically create an expense linked to this deposit
+        category, _ = Category.objects.get_or_create(name="Savings/Goals")
+        Expense.objects.create(
+            user=request.user,
+            category=category,
+            amount=amount,
+            description=f"Deposit to goal: {goal.title}",
+            date=timezone.now()
+        )
+        messages.success(request, "Deposit recorded and budget updated.")
+
+@login_required
+def edit_budget(request):
+    cycle = BudgetCycle.objects.filter(user=request.user).last()
+    if not cycle:
+        messages.error(request, "No budget cycle found. Please set one up first.")
+        return redirect('setup')
+    if request.method == 'POST':
+        form = BudgetCycleForm(request.POST)
+        if form.is_valid():
+            cycle.total_budget = form.cleaned_data['total_budget']
+            cycle.save()
+            messages.success(request, 'Budget updated!')
+            return redirect('dashboard')
+    else:
+        form = BudgetCycleForm(initial={'total_budget': cycle.total_budget})
+    return render(request, 'edit_budget.html', {'form': form})
+
+@login_required
+def delete_goal(request, goal_id):
+    goal = SavingGoal.objects.filter(id=goal_id, user=request.user).first()
+    if goal:
+        goal.delete()
+        messages.success(request, "Goal deleted successfully.")
+    return redirect("goals")

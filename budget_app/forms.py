@@ -1,14 +1,36 @@
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
+from datetime import date
 from .models import Feedback, Category, Expense
 from .models import SavingGoal
 
 
-class ExpenseEditForm(forms.ModelForm):
+
+class ExpenseAddForm(forms.ModelForm):
+    # Field for existing categories
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        required=False,
+        empty_label="Select a Category",
+        widget=forms.Select(attrs={'class': 'form-control', 'id': 'category-select'})
+    )
+    
+    # Hidden field that only appears if "+ New Category" is picked
+    new_category_name = forms.CharField(
+        required=False,
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control mt-2', 
+            'placeholder': 'Enter new category name',
+            'style': 'display: none;',
+            'id': 'new-category-input'
+        })
+    )
+
     class Meta:
         model = Expense
-        fields = ["amount", "category", "description", "date"]
+        fields = ['amount', 'description', 'date']
 
 class ExpenseFilterForm(forms.Form):
     category = forms.ModelChoiceField(queryset=Category.objects.all(), required=False)
@@ -84,6 +106,12 @@ class SavingGoalForm(forms.ModelForm):
             "target_amount": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "deadline": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
         }
+    def clean_deadline(self):
+        deadline = self.cleaned_data.get("deadline")
+        # Validation: Deadline cannot be in the past
+        if deadline and deadline < date.today():
+           raise forms.ValidationError("The deadline cannot be in the past.")
+        return deadline
 
 
 class GoalDepositForm(forms.Form):
@@ -93,3 +121,14 @@ class GoalDepositForm(forms.Form):
         min_value=0.01,
         widget=forms.NumberInput(attrs={"class": "form-control", "step": "0.01"})
     )
+
+class BudgetCycleForm(forms.Form):
+    total_budget = forms.DecimalField(max_digits=10, decimal_places=2, min_value=0.01, label="Monthly Budget Amount")
+    start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Start Date (optional)")
+    end_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="End Date (optional)")
+    def clean(self):
+        cleaned_data = super().clean()
+        start = cleaned_data.get("start_date")
+        end = cleaned_data.get("end_date")
+        if start and end and end <= start:
+            raise forms.ValidationError("End date must be after start date.")

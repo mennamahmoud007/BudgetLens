@@ -18,4 +18,6 @@ urlpatterns = [
     path("goals/", views.goals_list, name="goals"),
     path("goals/add/", views.add_goal, name="add_goal"),
     path("goals/<int:goal_id>/deposit/", views.deposit_goal, name="deposit_goal"),
+    path('budget/edit/', views.edit_budget, name='edit_budget'),
+    path("goals/<int:goal_id>/delete/", views.delete_goal, name="delete_goal"),
 ]

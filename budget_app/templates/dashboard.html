@@ -12,14 +12,20 @@
                     <label>Filter by period:</label>
                     <div class="btn-group">
                         <a href="?days=7"
-                            class="btn btn-sm btn-outline-primary {% if selected_days == 7 %}active{% endif %}">Last 7
-                            days</a>
+                           class="btn btn-sm btn-outline-primary {% if selected_days == 7 %}active{% endif %}">
+                            Last 7
+                            days
+                        </a>
                         <a href="?days=30"
-                            class="btn btn-sm btn-outline-primary {% if selected_days == 30 %}active{% endif %}">Last 30
-                            days</a>
+                           class="btn btn-sm btn-outline-primary {% if selected_days == 30 %}active{% endif %}">
+                            Last 30
+                            days
+                        </a>
                         <a href="?days=90"
-                            class="btn btn-sm btn-outline-primary {% if selected_days == 90 %}active{% endif %}">Last 90
-                            days</a>
+                           class="btn btn-sm btn-outline-primary {% if selected_days == 90 %}active{% endif %}">
+                            Last 90
+                            days
+                        </a>
                     </div>
                 </div>
             </div>
@@ -42,9 +48,9 @@
     {% endif %}
     <div class="col-md-12 mb-4">
         <div class="card {% if budget_exceeded %}border-danger{% else %}border-primary{% endif %}">
-            <div
-                class="card-header {% if budget_exceeded %}bg-danger text-white{% else %}bg-primary text-white{% endif %}">
-                <h4>📅 Budget Cycle Overview ({{ cycle.start_date }} to {{ cycle.end_date }})</h4>
+            <div class="card-header {% if budget_exceeded %}bg-danger text-white{% else %}bg-primary text-white{% endif %} d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">📅 Budget Cycle Overview ({{ cycle.start_date }} to {{ cycle.end_date }})</h4>
+                <a href="{% url 'edit_budget' %}" class="btn btn-sm btn-light">✏️ Edit Budget</a>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -69,8 +75,8 @@
                 <div class="progress mt-3" style="height: 25px;">
                     {% widthratio spent total_budget 100 as progress_percent %}
                     <div class="progress-bar {% if progress_percent >= 80 %}bg-danger{% elif progress_percent >= 50 %}bg-warning{% else %}bg-success{% endif %}"
-                        role="progressbar" style="width: {{ progress_percent }}%;"
-                        aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+                         role="progressbar" style="width: {{ progress_percent }}%;"
+                         aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100">
                         {{ progress_percent }}% Spent
                     </div>
                 </div>
@@ -112,15 +118,14 @@
                 {% if weekly_comparison.percent_change > 0 %}
                 <small class="text-warning">↑ {{ weekly_comparison.percent_change|floatformat:1 }}% vs last week</small>
                 {% elif weekly_comparison.percent_change < 0 %} <small class="text-light">↓ {{weekly_comparison.percent_change | floatformat:1 }}% vs last week</small>
-                    {% else %}
-                    <small>Same as last week</small>
-                    {% endif %}
+                {% else %}
+                <small>Same as last week</small>
+                {% endif %}
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div
-            class="card {% if budget_exceeded %}bg-danger{% elif alert %}bg-warning{% else %}bg-success{% endif %} text-white mb-3">
+        <div class="card {% if budget_exceeded %}bg-danger{% elif alert %}bg-warning{% else %}bg-success{% endif %} text-white mb-3">
             <div class="card-body">
                 <h5 class="card-title">Alert Status</h5>
                 {% if budget_exceeded %}
@@ -213,8 +218,9 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4" class="text-center">No expenses yet. <a
-                                        href="{% url 'add_expense' %}">Add your first expense!</a></td>
+                                <td colspan="4" class="text-center">
+                                    No expenses yet. <a href="{% url 'add_expense' %}">Add your first expense!</a>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -225,6 +231,50 @@
         </div>
     </div>
 </div>
+<!-- Saving Goals Section -->
+<div class="card mt-4">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">🎯 Saving Goals</h4>
+        <a href="{% url 'add_goal' %}" class="btn btn-sm btn-light">+ Add Goal</a>
+    </div>
+    <div class="card-body">
+        {% if active_goals %}
+        <div class="row">
+            {% for goal in active_goals %}
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 border-success">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ goal.title }}</h5>
+                        <p class="text-muted mb-1">
+                            <span class="text-success fw-bold">${{ goal.current_amount|floatformat:2 }}</span>
+                            / ${{ goal.target_amount|floatformat:2 }}
+                        </p>
+                        {% if goal.deadline %}
+                        <small class="text-muted">🗓 Deadline: {{ goal.deadline|date:"M d, Y" }}</small>
+                        {% endif %}
+                        <div class="progress my-2" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: {{ goal.progress_percent }}%;"
+                                 aria-valuenow="{{ goal.progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <small class="text-muted">{{ goal.progress_percent }}% complete</small>
+                        <div class="mt-2">
+                            <a href="{% url 'deposit_goal' goal.id %}" class="btn btn-sm btn-outline-success">💰 Deposit</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <a href="{% url 'goals' %}" class="btn btn-sm btn-success">View All Goals →</a>
+        {% else %}
+        <p class="text-muted mb-2">No active saving goals yet.</p>
+        <a href="{% url 'add_goal' %}" class="btn btn-sm btn-outline-success">+ Create your first goal</a>
+        {% endif %}
+    </div>
+</div>
+
 <div class="card mt-4 border-danger">
     <div class="card-header bg-danger text-white">
         Danger Zone
@@ -237,7 +287,7 @@
             {% csrf_token %}
 
             <button type="submit" class="btn btn-danger"
-                onclick="return confirm('Are you sure you want to reset your budget cycle? This cannot be undone!')">
+                    onclick="return confirm('Are you sure you want to reset your budget cycle? This cannot be undone!')">
                 Reset Budget Cycle
             </button>
         </form>
@@ -254,74 +304,74 @@
     const categoryValues = Object.values(categoryData);
 
     const colors = [
-        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-        '#FF9F40', '#FF6384', '#C9CBCF', '#7CFC00', '#FF1493'
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+    '#FF9F40', '#FF6384', '#C9CBCF', '#7CFC00', '#FF1493'
     ];
 
     if (categoryLabels.length > 0) {
-        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-        new Chart(categoryCtx, {
-            type: 'pie',
-            data: {
-                labels: categoryLabels,
-                datasets: [{
-                    data: categoryValues,
-                    backgroundColor: colors.slice(0, categoryLabels.length),
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' },
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                const value = context.raw || 0;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return `${context.label}: $${value} (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+    type: 'pie',
+    data: {
+    labels: categoryLabels,
+    datasets: [{
+    data: categoryValues,
+    backgroundColor: colors.slice(0, categoryLabels.length),
+    borderWidth: 2
+    }]
+    },
+    options: {
+    responsive: true,
+    plugins: {
+    legend: { position: 'bottom' },
+    tooltip: {
+    callbacks: {
+    label: function (context) {
+    const value = context.raw || 0;
+    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+    const percentage = ((value / total) * 100).toFixed(1);
+    return `${context.label}: $${value} (${percentage}%)`;
+    }
+    }
+    }
+    }
+    }
+    });
     } else {
-        document.getElementById('categoryChart').parentElement.innerHTML = '<p class="text-center">No data to display. Add some expenses!</p>';
+    document.getElementById('categoryChart').parentElement.innerHTML = '<p class="text-center">No data to display. Add some expenses!</p>';
     }
 
     const trendData = JSON.parse(document.getElementById('trend-data').textContent);
     const trendCtx = document.getElementById('trendChart').getContext('2d');
     new Chart(trendCtx, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(trendData),
-            datasets: [{
-                label: 'Monthly Spending ($)',
-                data: Object.values(trendData),
-                backgroundColor: '#36A2EB',
-                borderColor: '#1E88E5',
-                borderWidth: 1,
-                borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true, title: { display: true, text: 'Amount ($)' } },
-                x: { title: { display: true, text: 'Month' } }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return `$${context.raw.toFixed(2)}`;
-                        }
-                    }
-                }
-            }
-        }
+    type: 'bar',
+    data: {
+    labels: Object.keys(trendData),
+    datasets: [{
+    label: 'Monthly Spending ($)',
+    data: Object.values(trendData),
+    backgroundColor: '#36A2EB',
+    borderColor: '#1E88E5',
+    borderWidth: 1,
+    borderRadius: 5
+    }]
+    },
+    options: {
+    responsive: true,
+    scales: {
+    y: { beginAtZero: true, title: { display: true, text: 'Amount ($)' } },
+    x: { title: { display: true, text: 'Month' } }
+    },
+    plugins: {
+    tooltip: {
+    callbacks: {
+    label: function (context) {
+    return `$${context.raw.toFixed(2)}`;
+    }
+    }
+    }
+    }
+    }
     });
 </script>
 
