@@ -15,7 +15,10 @@ DATE_FORMAT = "%Y-%m-%d"
 # -----------------------------
 def validate_amount(amount: any) -> bool:
     """
-    Check if amount is a valid positive number.
+    Verifies that the provided input is a valid numerical value greater than zero.
+    
+    :param amount: The value to be checked.
+    :return: True if valid, False otherwise.
     """
     try:
         value = float(amount)
@@ -45,7 +48,11 @@ def is_valid_category(category: any) -> bool:
 # -----------------------------
 def format_currency(value: any, currency: str = "EGP") -> str:
     """
-    Format a number into currency format.
+    Converts a raw numerical value into a human-readable currency string.
+    
+    :param value: The amount to format.
+    :param currency: The currency code (default 'EGP').
+    :return: A string formatted with two decimal places and the currency code.
     """
     try:
         return f"{float(value):,.2f} {currency}"

@@ -45,6 +45,10 @@ from .services.budget_service import (
 from .services.expense_service import ExpenseService
 
 def signup(request):
+    """
+    Handles basic user registration using Django's built-in UserCreationForm.
+    Redirects to the login page upon successful account creation.
+    """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -60,6 +64,10 @@ def signup(request):
 
 @login_required
 def setup_view(request):
+    """
+    Renders the initial budget setup page for new users.
+    Processes the BudgetCycleForm to create the user's first budget cycle.
+    """
     if request.method == 'POST':
         form = BudgetCycleForm(request.POST)
         if form.is_valid():
@@ -76,6 +84,10 @@ def setup_view(request):
 
 @login_required
 def add_expense(request):
+    """
+    Handles the creation of new expense records. 
+    Validates user input and checks if the new expense exceeds the budget threshold.
+    """
     if request.method == 'POST':
         amount = request.POST.get('amount')
         category_choice = request.POST.get('category')
@@ -102,6 +114,10 @@ def add_expense(request):
 
 @login_required
 def dashboard(request):
+    """
+    Main user landing page. Retrieves the current budget cycle and 
+    recent spending data to render the primary status overview.
+    """
     """Dashboard with insights and charts - uses AnalyticsService"""
     # Get filter from URL (default 30 days)
     days = int(request.GET.get('days', 30))
@@ -179,6 +195,10 @@ def dashboard(request):
 
 @login_required
 def expense_list(request):
+    """
+    Displays a filterable list of all expenses for the logged-in user.
+    Supports filtering by category, start date, and end date.
+    """
     expenses = ExpenseService.get_user_expenses(request.user)
     form = ExpenseFilterForm(request.GET or None)
 
@@ -210,6 +230,10 @@ def delete_expense(request, expense_id):
 
 @login_required
 def edit_expense(request, expense_id):
+    """
+    Allows the user to modify an existing expense record.
+    Recalculates the daily budget rollover after a successful update.
+    """
     expense = ExpenseService.get_expense_by_id(expense_id, request.user)
     if not expense:
         messages.error(request, "Expense not found or access denied.")
@@ -230,6 +254,10 @@ def edit_expense(request, expense_id):
     return render(request, "edit_expense.html", {"form": form, "expense": expense})
 @login_required
 def alerts_view(request):
+    """
+    Checks the current budget cycle against the spending threshold
+    and displays an alert message if 80% of the budget has been reached.
+    """
     cycle = BudgetCycle.objects.filter(user=request.user).last()
     alert = None
     if cycle and check_threshold(cycle.spent, cycle.total_budget):
@@ -238,13 +266,22 @@ def alerts_view(request):
     return render(request, 'alerts.html', {'alert': alert, 'cycle': cycle})
 @login_required
 def reset_cycle_view(request):
+    """
+    Deletes the user's current budget cycle and all associated data.
+    Redirects to the setup page to start a fresh cycle.
+    """
     if request.method == "POST":
         reset_budget_cycle(request.user)
         messages.success(request, "Budget cycle reset successfully!")
         return redirect('setup')
     
     return redirect('dashboard')
+
 class StyledLoginForm(AuthenticationForm):
+    """
+    Customized login form with Bootstrap-styled input widgets
+    for username and password fields.
+    """
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
         'placeholder': 'Enter username'
@@ -255,6 +292,10 @@ class StyledLoginForm(AuthenticationForm):
         'placeholder': 'Enter password'
     }))
 def signup_view(request):
+    """
+    Handles new user registration using the styled signup form.
+    Logs the user in automatically upon successful registration.
+    """
     if request.method == "POST":
         form = StyledSignUpForm(request.POST)
         if form.is_valid():
@@ -267,6 +308,10 @@ def signup_view(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 def feedback_view(request):
+    """
+    Handles user feedback submission and displays all previously submitted feedback.
+    Saves valid feedback entries and redirects to prevent duplicate submissions.
+    """
     if request.method == "POST":
         form = FeedbackForm(request.POST)
         if form.is_valid():
@@ -286,6 +331,10 @@ def feedback_view(request):
     })
 @login_required
 def chatbot_response(request):
+    """
+    Simple rule-based chatbot that responds to keywords in the user's message.
+    Handles queries about budget status, expense count, and saving tips.
+    """
     message = request.GET.get("message", "").lower()
 
     cycle = BudgetCycle.objects.filter(user=request.user).last()
@@ -315,12 +364,19 @@ def chatbot_response(request):
 
 @login_required
 def goals_list(request):
+    """
+    Displays all saving goals for the logged-in user, ordered by creation date.
+    """
     goals = SavingGoal.objects.filter(user=request.user).order_by("-created_at")
     return render(request, "Goals.html", {"goals": goals})
 
 
 @login_required
 def add_goal(request):
+    """
+    Handles creation of a new saving goal for the logged-in user.
+    Validates the goal form and associates the goal with the current user.
+    """
     if request.method == "POST":
         form = SavingGoalForm(request.POST)
         if form.is_valid():
@@ -336,6 +392,11 @@ def add_goal(request):
 
 @login_required
 def deposit_goal(request, goal_id):
+    """
+    Processes a deposit toward a specific saving goal.
+    Automatically creates a linked expense entry and marks the goal
+    as completed if the target amount is reached.
+    """
     goal = SavingGoal.objects.filter(id=goal_id, user=request.user).first()
     if not goal:
         messages.error(request, "Goal not found.")
@@ -384,6 +445,10 @@ def deposit_goal(request, goal_id):
 
 @login_required
 def edit_budget(request):
+    """
+    Allows the user to update the total budget amount for their current cycle.
+    Redirects to setup if no active budget cycle exists.
+    """
     cycle = BudgetCycle.objects.filter(user=request.user).last()
     if not cycle:
         messages.error(request, "No budget cycle found. Please set one up first.")
@@ -401,6 +466,10 @@ def edit_budget(request):
 
 @login_required
 def delete_goal(request, goal_id):
+    """
+    Deletes a saving goal belonging to the logged-in user.
+    Silently ignores the request if the goal is not found.
+    """
     goal = SavingGoal.objects.filter(id=goal_id, user=request.user).first()
     if goal:
         goal.delete()
@@ -410,6 +479,11 @@ def delete_goal(request, goal_id):
 
 
 def export_weekly_report(request):
+    """
+    Generates and returns a downloadable PDF bank statement
+    summarizing the user's expenses over the past 7 days,
+    broken down by category.
+    """
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="BudgetLens_Statement.pdf"'

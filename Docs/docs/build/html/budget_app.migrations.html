@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>budget_app.migrations package &#8212; BudgetLens 2026 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=fc6fd62b"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="budget-app-migrations-package">
+<h1>budget_app.migrations package<a class="headerlink" href="#budget-app-migrations-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-budget_app.migrations.0001_initial">
+<span id="budget-app-migrations-0001-initial-module"></span><h2>budget_app.migrations.0001_initial module<a class="headerlink" href="#module-budget_app.migrations.0001_initial" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="budget_app.migrations.0001_initial.Migration">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">budget_app.migrations.0001_initial.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/budget_app/migrations/0001_initial.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#budget_app.migrations.0001_initial.Migration" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0001_initial.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('auth',</span> <span class="pre">'__first__')]</span></span><a class="headerlink" href="#budget_app.migrations.0001_initial.Migration.dependencies" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0001_initial.Migration.initial">
+<span class="sig-name descname"><span class="pre">initial</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#budget_app.migrations.0001_initial.Migration.initial" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0001_initial.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;CreateModel</span>&#160; <span class="pre">name='Category',</span> <span class="pre">fields=[('id',</span> <span class="pre">&lt;django.db.models.fields.BigAutoField&gt;),</span> <span class="pre">('name',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;)]&gt;,</span> <span class="pre">&lt;CreateModel</span>&#160; <span class="pre">name='Expense',</span> <span class="pre">fields=[('id',</span> <span class="pre">&lt;django.db.models.fields.BigAutoField&gt;),</span> <span class="pre">('amount',</span> <span class="pre">&lt;django.db.models.fields.DecimalField&gt;),</span> <span class="pre">('description',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('date',</span> <span class="pre">&lt;django.db.models.fields.DateField&gt;),</span> <span class="pre">('category',</span> <span class="pre">&lt;django.db.models.fields.related.ForeignKey&gt;),</span> <span class="pre">('user',</span> <span class="pre">&lt;django.db.models.fields.related.ForeignKey&gt;)]&gt;]</span></span><a class="headerlink" href="#budget_app.migrations.0001_initial.Migration.operations" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-budget_app.migrations.0002_budgetcycle">
+<span id="budget-app-migrations-0002-budgetcycle-module"></span><h2>budget_app.migrations.0002_budgetcycle module<a class="headerlink" href="#module-budget_app.migrations.0002_budgetcycle" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="budget_app.migrations.0002_budgetcycle.Migration">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">budget_app.migrations.0002_budgetcycle.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/budget_app/migrations/0002_budgetcycle.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#budget_app.migrations.0002_budgetcycle.Migration" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0002_budgetcycle.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('budget_app',</span> <span class="pre">'0001_initial'),</span> <span class="pre">('auth',</span> <span class="pre">'__first__')]</span></span><a class="headerlink" href="#budget_app.migrations.0002_budgetcycle.Migration.dependencies" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0002_budgetcycle.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;CreateModel</span>&#160; <span class="pre">name='BudgetCycle',</span> <span class="pre">fields=[('id',</span> <span class="pre">&lt;django.db.models.fields.BigAutoField&gt;),</span> <span class="pre">('start_date',</span> <span class="pre">&lt;django.db.models.fields.DateField&gt;),</span> <span class="pre">('end_date',</span> <span class="pre">&lt;django.db.models.fields.DateField&gt;),</span> <span class="pre">('total_budget',</span> <span class="pre">&lt;django.db.models.fields.DecimalField&gt;),</span> <span class="pre">('user',</span> <span class="pre">&lt;django.db.models.fields.related.ForeignKey&gt;)]&gt;]</span></span><a class="headerlink" href="#budget_app.migrations.0002_budgetcycle.Migration.operations" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-budget_app.migrations.0003_feedback">
+<span id="budget-app-migrations-0003-feedback-module"></span><h2>budget_app.migrations.0003_feedback module<a class="headerlink" href="#module-budget_app.migrations.0003_feedback" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="budget_app.migrations.0003_feedback.Migration">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">budget_app.migrations.0003_feedback.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/budget_app/migrations/0003_feedback.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#budget_app.migrations.0003_feedback.Migration" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0003_feedback.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('budget_app',</span> <span class="pre">'0002_budgetcycle')]</span></span><a class="headerlink" href="#budget_app.migrations.0003_feedback.Migration.dependencies" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0003_feedback.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;CreateModel</span>&#160; <span class="pre">name='Feedback',</span> <span class="pre">fields=[('id',</span> <span class="pre">&lt;django.db.models.fields.BigAutoField&gt;),</span> <span class="pre">('name',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('message',</span> <span class="pre">&lt;django.db.models.fields.TextField&gt;),</span> <span class="pre">('rating',</span> <span class="pre">&lt;django.db.models.fields.IntegerField&gt;),</span> <span class="pre">('created_at',</span> <span class="pre">&lt;django.db.models.fields.DateTimeField&gt;)]&gt;]</span></span><a class="headerlink" href="#budget_app.migrations.0003_feedback.Migration.operations" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-budget_app.migrations.0004_budgetcycle_rollover_fields">
+<span id="budget-app-migrations-0004-budgetcycle-rollover-fields-module"></span><h2>budget_app.migrations.0004_budgetcycle_rollover_fields module<a class="headerlink" href="#module-budget_app.migrations.0004_budgetcycle_rollover_fields" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="budget_app.migrations.0004_budgetcycle_rollover_fields.Migration">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">budget_app.migrations.0004_budgetcycle_rollover_fields.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/budget_app/migrations/0004_budgetcycle_rollover_fields.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#budget_app.migrations.0004_budgetcycle_rollover_fields.Migration" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0004_budgetcycle_rollover_fields.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('budget_app',</span> <span class="pre">'0003_feedback')]</span></span><a class="headerlink" href="#budget_app.migrations.0004_budgetcycle_rollover_fields.Migration.dependencies" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0004_budgetcycle_rollover_fields.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AddField</span>&#160; <span class="pre">model_name='budgetcycle',</span> <span class="pre">name='remaining_balance',</span> <span class="pre">field=&lt;django.db.models.fields.DecimalField&gt;&gt;,</span> <span class="pre">&lt;AddField</span>&#160; <span class="pre">model_name='budgetcycle',</span> <span class="pre">name='daily_limit',</span> <span class="pre">field=&lt;django.db.models.fields.DecimalField&gt;&gt;,</span> <span class="pre">&lt;AddField</span>&#160; <span class="pre">model_name='budgetcycle',</span> <span class="pre">name='last_recalculated_date',</span> <span class="pre">field=&lt;django.db.models.fields.DateField&gt;&gt;]</span></span><a class="headerlink" href="#budget_app.migrations.0004_budgetcycle_rollover_fields.Migration.operations" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-budget_app.migrations.0005_savinggoal">
+<span id="budget-app-migrations-0005-savinggoal-module"></span><h2>budget_app.migrations.0005_savinggoal module<a class="headerlink" href="#module-budget_app.migrations.0005_savinggoal" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="budget_app.migrations.0005_savinggoal.Migration">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">budget_app.migrations.0005_savinggoal.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/budget_app/migrations/0005_savinggoal.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#budget_app.migrations.0005_savinggoal.Migration" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0005_savinggoal.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('budget_app',</span> <span class="pre">'0004_budgetcycle_rollover_fields'),</span> <span class="pre">('auth',</span> <span class="pre">'__first__')]</span></span><a class="headerlink" href="#budget_app.migrations.0005_savinggoal.Migration.dependencies" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0005_savinggoal.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;CreateModel</span>&#160; <span class="pre">name='SavingGoal',</span> <span class="pre">fields=[('id',</span> <span class="pre">&lt;django.db.models.fields.BigAutoField&gt;),</span> <span class="pre">('title',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('target_amount',</span> <span class="pre">&lt;django.db.models.fields.DecimalField&gt;),</span> <span class="pre">('current_amount',</span> <span class="pre">&lt;django.db.models.fields.DecimalField&gt;),</span> <span class="pre">('deadline',</span> <span class="pre">&lt;django.db.models.fields.DateField&gt;),</span> <span class="pre">('created_at',</span> <span class="pre">&lt;django.db.models.fields.DateTimeField&gt;),</span> <span class="pre">('is_completed',</span> <span class="pre">&lt;django.db.models.fields.BooleanField&gt;),</span> <span class="pre">('user',</span> <span class="pre">&lt;django.db.models.fields.related.ForeignKey&gt;)]&gt;]</span></span><a class="headerlink" href="#budget_app.migrations.0005_savinggoal.Migration.operations" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-budget_app.migrations.0006_transaction">
+<span id="budget-app-migrations-0006-transaction-module"></span><h2>budget_app.migrations.0006_transaction module<a class="headerlink" href="#module-budget_app.migrations.0006_transaction" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="budget_app.migrations.0006_transaction.Migration">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">budget_app.migrations.0006_transaction.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/budget_app/migrations/0006_transaction.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#budget_app.migrations.0006_transaction.Migration" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0006_transaction.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('budget_app',</span> <span class="pre">'0005_savinggoal'),</span> <span class="pre">('auth',</span> <span class="pre">'__first__')]</span></span><a class="headerlink" href="#budget_app.migrations.0006_transaction.Migration.dependencies" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="budget_app.migrations.0006_transaction.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;CreateModel</span>&#160; <span class="pre">name='Transaction',</span> <span class="pre">fields=[('id',</span> <span class="pre">&lt;django.db.models.fields.BigAutoField&gt;),</span> <span class="pre">('type',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('amount',</span> <span class="pre">&lt;django.db.models.fields.DecimalField&gt;),</span> <span class="pre">('date',</span> <span class="pre">&lt;django.db.models.fields.DateField&gt;),</span> <span class="pre">('user',</span> <span class="pre">&lt;django.db.models.fields.related.ForeignKey&gt;)]&gt;]</span></span><a class="headerlink" href="#budget_app.migrations.0006_transaction.Migration.operations" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-budget_app.migrations">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-budget_app.migrations" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">BudgetLens</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Docs</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, The 404 team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/budget_app.migrations.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

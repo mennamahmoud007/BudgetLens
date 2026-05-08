@@ -4,14 +4,29 @@ from ..models import BudgetCycle, Expense
 from django.db.models import Sum
 
 class BudgetCalculator:
+    """
+    Service class providing static methods for financial calculations.
+    Handles daily limits and budget rollovers.
+    """
     @staticmethod
     def calculate_daily_limit(remaining_balance, remaining_days):
+        """
+        Calculates the maximum recommended spending per day to stay within budget.
+        
+        :param remaining_balance: The current funds available in the cycle.
+        :param remaining_days: Number of days left until the cycle ends.
+        :return: Decimal value of the daily limit.
+        """
         if remaining_days <= 0:
             return Decimal("0.00")
         return Decimal(remaining_balance) / Decimal(remaining_days)
 
     @staticmethod
     def apply_daily_rollover(cycle):
+        """
+        Updates the budget cycle state by calculating total spent and 
+        adjusting the daily limit based on the current date.
+        """
         today = timezone.now().date()
 
         effective_end = min(today, cycle.end_date)

@@ -4,14 +4,18 @@ from django.utils import timezone
 from decimal import Decimal
 
 class ExpenseService:
-    """Business logic for expense operations"""
+    """
+    Business logic layer for managing Expense operations.
+    Decouples the views from direct database manipulation.
+    """
     
     @staticmethod
     def add_expense(user, category_name, amount, description, date=None):
         """
-        Add a new expense with validation
-        Returns: Expense object
-        Raises: ValueError if validation fails
+        Validates and persists a new expense. 
+        Automatically handles category creation if the category name is new.
+        
+        :raises ValueError: If amount is zero or description is missing.
         """
         # Validation
         if amount <= 0:
@@ -38,7 +42,9 @@ class ExpenseService:
     
     @staticmethod
     def get_user_expenses(user, limit=None):
-        """Get all expenses for a user, ordered by most recent"""
+        """
+        Retrieves a history of expenses for a specific user, sorted by recency.
+        """
         expenses = Expense.objects.filter(user=user).order_by('-date')        
         if limit:
             expenses = expenses[:limit]

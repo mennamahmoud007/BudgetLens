@@ -4,12 +4,26 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 class Category(models.Model):
+    """
+    Represents a classification for financial transactions (e.g., Food, Rent).
+    Used to group expenses for analytical reporting.
+    """
     name = models.CharField(max_length=100)
     
     def __str__(self):
         return self.name
 
 class Expense(models.Model):
+    """
+    Represents an individual financial outflow recorded by a user.
+    
+    Attributes:
+        user: Reference to the User who owns this expense.
+        category: The Category assigned to this expense.
+        amount: The monetary value of the transaction.
+        description: A short text summary of the purchase.
+        date: The calendar date the expense occurred.
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -21,6 +35,13 @@ class Expense(models.Model):
 
  
 class BudgetCycle(models.Model):
+    """
+    Defines a specific time period (e.g., monthly) with a set spending limit.
+    
+    Properties:
+        spent: Calculates total expenses within this cycle's date range.
+        remaining_budget: Calculates the difference between the total budget and spending.
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
@@ -45,6 +66,10 @@ class BudgetCycle(models.Model):
     
    
 class Feedback(models.Model):
+    """
+    Stores user suggestions and ratings for the application.
+    Used for gathering qualitative data on user satisfaction.
+    """
     name = models.CharField(max_length=100, blank=True, null=True)
     message = models.TextField()
     rating = models.IntegerField(default=5)
@@ -54,6 +79,10 @@ class Feedback(models.Model):
         return self.message[:30]
 
 class SavingGoal(models.Model):
+    """
+    Tracks progress toward a specific financial target.
+    Calculates completion status based on current vs. target amounts.
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=120)
     target_amount = models.DecimalField(max_digits=10, decimal_places=2)

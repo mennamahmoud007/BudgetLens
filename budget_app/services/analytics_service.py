@@ -7,13 +7,18 @@ from decimal import Decimal
 from abc import ABC, abstractmethod
 
 class ChartStrategy(ABC):
-    """Strategy Interface"""
-    @abstractmethod
-    def format_data(self, category_data):
+   """
+    Abstract Base Class for visualization strategies. 
+    Defines the standard interface for formatting data for different chart types.
+    """
+   @abstractmethod
+   def format_data(self, category_data):
         pass
 
 class PieChartStrategy(ChartStrategy):
-    """Concrete Strategy for Pie Chart"""
+    """
+    Formats category-wise spending data into labels and values compatible with Pie Charts.
+    """
     def format_data(self, category_data):
         # Pie chart needs labels and values
         return {
@@ -35,7 +40,9 @@ class BarChartStrategy(ChartStrategy):
         }
 
 class LineChartStrategy(ChartStrategy):
-    """Concrete Strategy for Line Chart (for monthly trends)"""
+    """
+    Concrete strategy for Line Chart (for monthly trends)
+    """
     def format_data(self, category_data):
         # Line chart for trends over time
         return {
@@ -46,7 +53,10 @@ class LineChartStrategy(ChartStrategy):
         }
 
 class AnalyticsService:
-    """Business logic for insights and analytics"""
+    """
+    Aggregates complex data queries to provide summary statistics, 
+    such as total spending, daily averages, and category trends.
+    """
     def __init__(self, strategy=None):
         """Inject strategy (default: PieChart)"""
         self._strategy = strategy or PieChartStrategy()
