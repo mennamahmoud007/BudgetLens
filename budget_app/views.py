@@ -357,6 +357,15 @@ def feedback_view(request):
     feedbacks = Feedback.objects.all().order_by('-created_at')
     return render(request, 'feedback.html', {'form': form, 'feedbacks': feedbacks})
 
+@login_required
+def add_expense(request):
+    if request.method == 'POST':
+        # ... existing POST logic unchanged ...
+        pass
+
+    # ADD THIS to the GET render:
+    cycle = BudgetCycle.objects.filter(user=request.user).last()
+    return render(request, 'add_expense.html', {'cycle': cycle})
 
 @login_required
 def chatbot_response(request):
