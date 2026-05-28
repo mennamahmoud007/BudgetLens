@@ -1,204 +1,385 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BudgetLens</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <style>
+        :root {
+            --bg-color: #F8F9FB;
+            --primary-purple: #6C5DD3;
+            --dark-navy: #11142D;
+            --text-main: #1B1D21;
+            --text-muted: #808191;
+            --danger-red: #FF754C;
+            --success-green: #22C55E;
+            --warning-yellow: #FFA2C0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* Navbar */
+        .navbar-custom {
+            background-color: #ffffff;
+            padding: 0.8rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            border-bottom: 1px solid #F1F1F5;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-main) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 30px;
+            height: 30px;
+            background: conic-gradient(from 180deg, #FF754C, #6C5DD3, #33D69F);
+            border-radius: 50%;
+        }
+
+        .nav-center-links {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+        }
+
+            .nav-center-links a {
+                text-decoration: none;
+                color: var(--text-muted);
+                font-weight: 500;
+                padding-bottom: 1.2rem;
+                margin-bottom: -1.2rem;
+                border-bottom: 3px solid transparent;
+                transition: all 0.2s ease;
+            }
+
+                .nav-center-links a:hover,
+                .nav-center-links a.active {
+                    color: var(--primary-purple);
+                    border-bottom: 3px solid var(--primary-purple);
+                }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .date-picker-mock {
+            border: 1px solid #E4E4E4;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #FF754C;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            background: #ffffff;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background: transparent;
+            border-bottom: none;
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-purple);
+            border-color: var(--primary-purple);
+            border-radius: 12px;
+            padding: 8px 20px;
+        }
+
+            .btn-primary:hover {
+                background-color: #5b4eb8;
+                border-color: #5b4eb8;
+            }
+
+        /* Chatbot */
+        #chatbot-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-purple);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            transition: transform 0.2s;
+        }
+
+            #chatbot-toggle:hover {
+                transform: scale(1.05);
+            }
+
+        #chatbox {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 320px;
+            height: 420px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 9999;
+        }
+
+        #chat-header {
+            background: var(--primary-purple);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        #chat-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #F8F9FB;
+        }
+
+        .message {
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 15px;
+            max-width: 80%;
+            font-size: 14px;
+        }
+
+        .user-msg {
+            background: #E2DFFF;
+            margin-left: auto;
+            color: #111;
+        }
+
+        .bot-msg {
+            background: white;
+            border: 1px solid #eee;
+        }
+
+        #chat-input {
+            display: flex;
+            border-top: 1px solid #eee;
+            padding: 10px;
+        }
+
+            #chat-input input {
+                flex: 1;
+                border: 1px solid #eee;
+                border-radius: 20px;
+                padding: 10px 15px;
+                outline: none;
+            }
+
+            #chat-input button {
+                background: transparent;
+                border: none;
+                color: var(--primary-purple);
+                font-weight: 600;
+                padding: 0 15px;
+            }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand text-white" href="{% url 'dashboard' %}">BudgetLens 📷</a>
-            {% if user.is_authenticated %}
-            <div class="d-flex gap-2 align-items-center">
-                <span class="text-white me-3">Hello, {{ user.username }}!</span>
-                {% if not user.budgetcycle_set.exists %}
-                <a href="{% url 'setup' %}" class="btn btn-warning btn-sm">Set Budget</a>
-                {% endif %}
-                <a href="{% url 'add_expense' %}" class="btn btn-success btn-sm">+ Add Expense</a>
-                <a href="{% url 'goals' %}" class="btn btn-secondary btn-sm">Goals</a>
-                <a href="{% url 'history' %}" class="btn btn-info btn-sm">History</a>
-                <a href="{% url 'alerts' %}" class="btn btn-warning btn-sm">Alerts</a>
-                <form method="POST" action="{% url 'logout' %}" style="display: inline;">
-                    <a href="{% url 'feedback' %}" class="btn btn-primary btn-sm">Feedback</a>
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-sm">Logout</button>
-                </form>
-            </div>
-            {% else %}
-            <div class="d-flex gap-2">
-                <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">Login</a>
-                <a href="{% url 'signup' %}" class="btn btn-light btn-sm">Sign Up</a>
-            </div>
-            {% endif %}
+    <nav class="navbar-custom d-flex justify-content-between align-items-center mb-4">
+        <a class="navbar-brand" href="{% url 'dashboard' %}">
+            <div class="brand-icon"></div> BudgetLens
+        </a>
+
+        {% if user.is_authenticated %}
+        <div class="nav-center-links d-none d-lg-flex" id="nav-links">
+            <a href="{% url 'dashboard' %}" class="nav-item">Dashboard</a>
+            <a href="{% url 'add_expense' %}" class="nav-item">Expenses</a>
+            <a href="{% url 'goals' %}" class="nav-item">Goals</a>
+            <a href="{% url 'history' %}" class="nav-item">History</a>
         </div>
-        <!-- Chatbot Button -->
-        <button id="chatbot-toggle" onclick="toggleChat()">💬</button>
 
-        <!-- Chatbot Box -->
-        <div id="chatbox">
-            <div id="chat-header">BudgetLens Assistant</div>
-
-            <div id="chat-body">
-                <div class="message bot-msg">
-                    Hello 👋 I’m your Budget Assistant
-                </div>
+        <div class="user-controls">
+            <div class="date-picker-mock d-none d-md-flex">
+                <i class="bi bi-calendar4"></i>
+                <span>
+                    {% if cycle %}
+                    {{ cycle.start_date|date:"M d" }} - {{ cycle.end_date|date:"M d, Y" }}
+                    {% else %}
+                    No Active Cycle
+                    {% endif %}
+                </span>
             </div>
 
-            <div id="chat-input">
-                <input type="text" id="userInput" placeholder="Ask about your budget...">
-                <button onclick="sendMessage()">Send</button>
+            <div class="avatar dropdown-toggle" data-bs-toggle="dropdown">
+                {{ user.username|make_list|first|upper }}
             </div>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-2">
+                <li><a class="dropdown-item" href="{% url 'setup' %}">Set Budget</a></li>
+                <li><a class="dropdown-item" href="{% url 'alerts' %}">Alerts</a></li>
+                <li><a class="dropdown-item" href="{% url 'feedback' %}">Feedback</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item text-danger">Logout</button>
+                    </form>
+                </li>
+            </ul>
         </div>
+        {% else %}
+        <div class="d-flex gap-2">
+            <a href="{% url 'login' %}" class="btn text-muted fw-bold">Login</a>
+            <a href="{% url 'signup' %}" class="btn btn-primary fw-bold text-white">Sign Up</a>
+        </div>
+        {% endif %}
     </nav>
 
-    <div class="container mt-4">
+    <!-- Chatbot Toggle Button -->
+    <button id="chatbot-toggle" onclick="toggleChat()">
+        <i class="bi bi-chat-dots-fill"></i>
+    </button>
+
+    <!-- Chatbot Box -->
+    <div id="chatbox">
+        <div id="chat-header">Budget Assistant</div>
+        <div id="chat-body">
+            <div class="message bot-msg">Hello 👋 I'm your Budget Assistant. How can I help?</div>
+        </div>
+        <div id="chat-input">
+            <input type="text" id="userInput" placeholder="Ask about your budget..." onkeypress="handleKey(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <div class="container-fluid px-4 px-md-5 pb-5 fade-in">
         {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 border-0 shadow-sm" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
         {% endif %}
 
         {% block content %}
         {% endblock %}
     </div>
-</body>
-<style>
-    @keyframes fadeSlideIn {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Set active nav link based on current URL
+        document.addEventListener("DOMContentLoaded", function () {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll(".nav-center-links a");
+        navLinks.forEach(link => {
+        if (link.getAttribute("href") === currentPath) {
+        link.classList.add("active");
         }
+        });
+        });
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-
-    .auth-card {
-        animation: fadeSlideIn 0.6s ease-out;
-    }
-
-
-    .btn:hover {
-        transform: scale(1.03);
-        transition: 0.2s;
-    }
-
-    #chatbot-toggle {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #25D366;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        font-size: 24px;
-        cursor: pointer;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        z-index: 9999;
-    }
-
-    #chatbox {
-        position: fixed;
-        bottom: 90px;
-        right: 20px;
-        width: 320px;
-        height: 420px;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        display: none;
-        flex-direction: column;
-        overflow: hidden;
-        z-index: 9999;
-    }
-
-    #chat-header {
-        background: #25D366;
-        color: white;
-        padding: 10px;
-        text-align: center;
-        font-weight: bold;
-    }
-
-    #chat-body {
-        flex: 1;
-        padding: 10px;
-        overflow-y: auto;
-        background: #f5f5f5;
-    }
-
-    .message {
-        padding: 8px 12px;
-        margin: 5px 0;
-        border-radius: 10px;
-        max-width: 80%;
-        font-size: 14px;
-    }
-
-    .user-msg {
-        background: #dcf8c6;
-        margin-left: auto;
-    }
-
-    .bot-msg {
-        background: white;
-        border: 1px solid #ddd;
-    }
-
-    #chat-input {
-        display: flex;
-        border-top: 1px solid #ddd;
-    }
-
-    #chat-input input {
-        flex: 1;
-        border: none;
-        padding: 10px;
-        outline: none;
-    }
-
-    #chat-input button {
-        background: #25D366;
-        border: none;
-        color: white;
-        padding: 10px 15px;
-    }
-</style>
-<script>
-    function toggleChat() {
-        let box = document.getElementById("chatbox");
+        // Chatbot toggle
+        function toggleChat() {
+        const box = document.getElementById("chatbox");
         box.style.display = box.style.display === "flex" ? "none" : "flex";
-        box.style.flexDirection = "column";
-    }
+        }
 
-    function sendMessage() {
-        let input = document.getElementById("userInput");
-        let message = input.value;
-        if (!message.trim()) return;
+        // Send on Enter key
+        function handleKey(event) {
+        if (event.key === "Enter") {
+        sendMessage();
+        }
+        }
 
-        let chatBody = document.getElementById("chat-body");
+        // Send message to chatbot
+        function sendMessage() {
+        const input = document.getElementById("userInput");
+        const message = input.value.trim();
+        if (!message) return;
 
+        const chatBody = document.getElementById("chat-body");
+
+        // Add user message
         chatBody.innerHTML += `<div class="message user-msg">${message}</div>`;
-
-        fetch(`/chatbot/?message=${message}`)
-            .then(res => res.json())
-            .then(data => {
-                chatBody.innerHTML += `<div class="message bot-msg">${data.reply}</div>`;
-                chatBody.scrollTop = chatBody.scrollHeight;
-            });
-
         input.value = "";
-    }
-</script>
+        chatBody.scrollTop = chatBody.scrollHeight;
 
+        // Fetch bot reply
+        fetch(`/chatbot/?message=${encodeURIComponent(message)}`)
+        .then(res => res.json())
+        .then(data => {
+        chatBody.innerHTML += `<div class="message bot-msg">${data.reply}</div>`;
+        chatBody.scrollTop = chatBody.scrollHeight;
+        })
+        .catch(() => {
+        chatBody.innerHTML += `<div class="message bot-msg">Sorry, something went wrong.</div>`;
+        chatBody.scrollTop = chatBody.scrollHeight;
+        });
+        }
+    </script>
+</body>
 </html>
